@@ -1,0 +1,55 @@
+cmake_minimum_required(VERSION 3.19)
+project(OpenGL)
+
+set(CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp"
+)
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+#GLAD 추가
+set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad)
+set(GLAD_SRC 
+    ${GLAD_DIR}/src/glad.c
+)
+add_library(GLAD_LIB STATIC ${GLAD_SRC})
+target_include_directories(GLAD_LIB PUBLIC
+    ${GLAD_DIR}/include
+)
+#GLFW 추가
+set(GLFW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw)
+add_library(GLFW_LIB STATIC IMPORTED)
+set_target_properties(GLFW_LIB PROPERTIES
+    IMPORTED_LOCATION ${GLFW_DIR}/lib-vc2022/glfw3dll.lib
+    INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
+)
+#GLM 추가
+set(GLW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm)
+add_library(GLM_LIB INTERFACE)
+target_include_directories(GLM_LIB INTERFACE
+    ${GLW_DIR}
+)
+
+if(APPLE)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+    )
+elseif(WIN32)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+    GLAD_LIB
+    GLM_LIB
+    GLFW_LIB
+    opengl32
+    )
+endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin"
+    OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
+    OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
+)
