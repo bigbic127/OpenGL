@@ -23,7 +23,7 @@ target_include_directories(GLAD_LIB PUBLIC
 set(GLFW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw)
 add_library(GLFW_LIB STATIC IMPORTED)
 set_target_properties(GLFW_LIB PROPERTIES
-    IMPORTED_LOCATION ${GLFW_DIR}/lib-universal/libglfw3.a
+    IMPORTED_LOCATION ${GLFW_DIR}/lib-vc2022/glfw3.lib
     INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
 )
 #GLM 추가

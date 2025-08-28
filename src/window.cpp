@@ -7,9 +7,10 @@
 #include <stb_image.h>
 #include <iostream>
 
-const GLint WIDTH = 800;
-const GLint HEIGHT = 600;
+GLint WIDTH = 800;
+GLint HEIGHT = 600;
 
+void Window_size_callback(GLFWwindow* window, int width, int height);
 void Framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
 void error_callback(int error, const char* description);
@@ -17,29 +18,25 @@ void error_callback(int error, const char* description);
 const GLchar* vertexShaderSource = R"(
     #version 410 core
     layout (location =0) in vec3 vPos;
-    layout (location =1) in vec2 uvs;
-    layout (location =2) in vec4 vColor;
+    layout (location =1) in vec2 aTexCoord;
     uniform mat4 transform;
-    out vec4 outColor;
     out vec2 texCoord;
     void main()
     {
         gl_Position =  transform * vec4(vPos.xyz, 1.0f);
-        outColor = vec4(vColor.xyz, 1.0);
-        texCoord = uvs;
+        texCoord = aTexCoord;
     }
 )";
 
 const GLchar* fragmentShaderSource = R"(
     #version 410 core
     out vec4 fragColor;
-    in vec4 outColor;
-    int vec2 texCoord;
+    in vec2 texCoord;
     uniform vec4 uColor;
-    uniform sampler2D texture1
+    uniform sampler2D texture1;
     void main()
     {
-        fragColor = uColor;
+        fragColor = texture(texture1, texCoord);
     }
 )";
 
@@ -91,6 +88,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetWindowSizeCallback(window, Window_size_callback);
     glfwSetFramebufferSizeCallback(window, Framebuffer_size_callback);
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -98,6 +96,7 @@ int main()
         glfwDestroyWindow(window);
         return -1;
     }
+    glEnable(GL_DEPTH_TEST);
     //Shader
     unsigned int vertexShader, fragmentShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -167,21 +166,26 @@ int main()
     //stb
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // y축 반전
-    unsigned char* data = stbi_load("../resource/wall.jpg", &width, &height, &nrChannels, 0);
+    const char* path = "../resource/wall.jpg";
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-    }else  std::cerr<<"Failed to load texture\n";
-        stbi_image_free(data);
+    }else
+        std::cerr<<"Failed to load texture\n";
+    stbi_image_free(data);
 
-    
+    glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
     while(!glfwWindowShouldClose(window))
     {
         ProcessInput(window);
 
         glClearColor(0.5f,0.5f,0.5f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
         unsigned int cID, transID;
@@ -192,16 +196,12 @@ int main()
         transID = glGetUniformLocation(shaderProgram, "transform");
         glm::mat4 transform = glm::mat4(1.0f);
         transform = glm::translate(transform, glm::vec3(0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f,0.1f,0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime() * 0.5f, glm::vec3(0.0f,0.1f,0.0f));
         transform = glm::scale(transform, glm::vec3(0.5f,0.5f,0.5f));
-        glm::mat4 camera = glm::lookAt(glm::vec3(0.0f,5.0f,-5.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
+        glm::mat4 camera = glm::lookAt(glm::vec3(0.0f,0.5f,-2.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
         glm::mat4 perspective = glm::perspective((float)70.f, (float)WIDTH/HEIGHT, (float)0.1f, (float)1000.0f);
         transform = perspective * camera * transform;
         glUniformMatrix4fv(transID, 1, GL_FALSE, glm::value_ptr(transform));
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,texture);
-        glUniform1i(glGetUniformLocation(shaderProgram,"texture1"),0);        
 
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -217,6 +217,13 @@ int main()
     glfwDestroyWindow(window);
     return 0;
 }
+
+void Window_size_callback(GLFWwindow* window, int width, int height)
+{
+    WIDTH = width;
+    HEIGHT = height;
+}
+
 
 void Framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

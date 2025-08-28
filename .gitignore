@@ -45,3 +45,4 @@ bin
 build
 dependencies
 resources
+CMakeLists.txt
