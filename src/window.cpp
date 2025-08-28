@@ -3,6 +3,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <iostream>
 
 const GLint WIDTH = 800;
@@ -15,14 +17,16 @@ void error_callback(int error, const char* description);
 const GLchar* vertexShaderSource = R"(
     #version 410 core
     layout (location =0) in vec3 vPos;
-    layout (location =1) in vec3 vColor;
-    layout (location =2) in vec2 uvs;
+    layout (location =1) in vec2 uvs;
+    layout (location =2) in vec4 vColor;
     uniform mat4 transform;
     out vec4 outColor;
+    out vec2 texCoord;
     void main()
     {
         gl_Position =  transform * vec4(vPos.xyz, 1.0f);
         outColor = vec4(vColor.xyz, 1.0);
+        texCoord = uvs;
     }
 )";
 
@@ -30,57 +34,41 @@ const GLchar* fragmentShaderSource = R"(
     #version 410 core
     out vec4 fragColor;
     in vec4 outColor;
+    int vec2 texCoord;
     uniform vec4 uColor;
+    uniform sampler2D texture1
     void main()
     {
         fragColor = uColor;
     }
 )";
 
-const float cubeVertices[] =
-{
-    1,  1, -1,  // 0: 오른쪽 위 앞
-    1, -1, -1,  // 1: 오른쪽 아래 앞
-   -1, -1, -1,  // 2: 왼쪽 아래 앞
-   -1,  1, -1,  // 3: 왼쪽 위 앞
-    1,  1,  1,  // 4: 오른쪽 위 뒤
-    1, -1,  1,  // 5: 오른쪽 아래 뒤
-   -1, -1,  1,  // 6: 왼쪽 아래 뒤
-   -1,  1,  1   // 7: 왼쪽 위 뒤
+const float cubeVertices[] = {
+    // positions        // UVs
+     1,  1, -1,         1.0f, 1.0f, // 0
+     1, -1, -1,         1.0f, 0.0f, // 1
+    -1, -1, -1,         0.0f, 0.0f, // 2
+    -1,  1, -1,         0.0f, 1.0f, // 3
+     1,  1,  1,         1.0f, 1.0f, // 4
+     1, -1,  1,         1.0f, 0.0f, // 5
+    -1, -1,  1,         0.0f, 0.0f, // 6
+    -1,  1,  1,         0.0f, 1.0f  // 7
 };
 
-const int cubeIndices[] =
-{
-    // 앞면
-    0, 1, 2,
-    0, 2, 3,
-    // 뒷면
-    4, 7, 6,
-    4, 6, 5,
-    // 왼쪽면
-    3, 2, 6,
-    3, 6, 7,
-    // 오른쪽면
-    0, 4, 5,
-    0, 5, 1,
-    // 윗면
-    0, 3, 7,
-    0, 7, 4,
-    // 아랫면
-    1, 5, 6,
-    1, 6, 2
+const unsigned int cubeIndices[] = {
+    // 앞
+    0,1,2, 0,2,3,
+    // 뒤
+    4,7,6, 4,6,5,
+    // 왼
+    3,2,6, 3,6,7,
+    // 오
+    0,4,5, 0,5,1,
+    // 위
+    0,3,7, 0,7,4,
+    // 아래
+    1,5,6, 1,6,2
 };
-const GLfloat vertices[] = 
-{
-    -0.5f, -0.5f, 0.0f,    1.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
-    0.0f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,
-};
-
-void DrawTriangle()
-{
-    
-}
 
 int main()
 {
@@ -161,9 +149,33 @@ int main()
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
 
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //stb
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true); // y축 반전
+    unsigned char* data = stbi_load("../resource/wall.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }else  std::cerr<<"Failed to load texture\n";
+        stbi_image_free(data);
+
+    
     while(!glfwWindowShouldClose(window))
     {
         ProcessInput(window);
@@ -176,6 +188,7 @@ int main()
         cID = glGetUniformLocation(shaderProgram, "uColor");
         float val = glm::abs(glm::sin(glfwGetTime()*0.5f));
         glUniform4f(cID, 0.0f, val, 0.0f, 1.0f);
+        // (model -> view -> perspective) -> (clip -> NDC)
         transID = glGetUniformLocation(shaderProgram, "transform");
         glm::mat4 transform = glm::mat4(1.0f);
         transform = glm::translate(transform, glm::vec3(0.0f));
@@ -185,6 +198,10 @@ int main()
         glm::mat4 perspective = glm::perspective((float)70.f, (float)WIDTH/HEIGHT, (float)0.1f, (float)1000.0f);
         transform = perspective * camera * transform;
         glUniformMatrix4fv(transID, 1, GL_FALSE, glm::value_ptr(transform));
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,texture);
+        glUniform1i(glGetUniformLocation(shaderProgram,"texture1"),0);        
 
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);

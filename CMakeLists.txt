@@ -44,7 +44,7 @@ if(APPLE)
     GLAD_LIB
     GLM_LIB
     GLFW_LIB
-    
+    STB_LIB
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
