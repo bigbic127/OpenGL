@@ -5,18 +5,19 @@
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 
-void Framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void Framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void ProcessInput(GLFWwindow* window);
 
 const GLchar* vertexShaderSource = R"(
     #version 450 core
-    layout (location =0) in vec4 vPos;
-    layout (location =1) in vec4 vColor;
+    layout (location =0) in vec3 vPos;
+    layout (location =1) in vec3 vColor;
     layout (location =2) in vec2 uvs;
     out vec4 outColor;
     void main()
     {
-        gl_Position = vPos;
-        outColor = vColor;
+        gl_Position = vec4(vPos.xyz, 1.0f);
+        outColor = vec4(vColor.xyz, 1.0);
     }
 )";
 
@@ -31,27 +32,16 @@ const GLchar* fragmentShaderSource = R"(
     }
 )";
 
+class Mesh
+{
+};
+
 const GLfloat vertices[] = 
 {
-    -0.5f, -0.5f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.0f, 1.0f,
-    0.0f,  0.5f, 0.0f, 1.0f
+    -0.5f, -0.5f, 0.0f,    1.0f, 0.0f, 0.0f,
+    0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
+    0.0f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,
 };
-
-const GLfloat vertices2[] = 
-{
-    0.5f,  1.0f, 0.0f, 1.0f,
-    1.0f, -0.0f, 0.0f, 1.0f,
-    -0.0f, -0.0f, 0.0f, 1.0f
-};
-
-const GLfloat colors[] =
-{
-    1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 1.0f,
-    0.0f,  0.0f, 1.0f, 1.0f 
-};
-
 
 
 void DrawTriangle()
@@ -100,6 +90,25 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    /*
+    int success;
+    char infoLog[512];
+
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        cout << "Failed to VertexShader Compile\n" << infoLog << endl; 
+    }
+
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        cout << "Failed to FragmentShader Compile\n" << infoLog << endl; 
+    }
+    */
+
     //Vertex Buffer
     unsigned int VAO, VBO[2];
     
@@ -109,15 +118,17 @@ int main()
     glGenBuffers(2, VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(window))
     {
+        ProcessInput(window);
+
         glClearColor(0.5f,0.5f,0.5f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -141,7 +152,13 @@ int main()
     return 0;
 }
 
-void Framebuffer_size_callback(GLFWwindow *window, int width, int height)
+void Framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void ProcessInput(GLFWwindow* window)
+{
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
