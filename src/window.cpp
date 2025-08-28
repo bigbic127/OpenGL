@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #include <iostream>
 
 const GLint WIDTH = 800;
@@ -15,10 +17,11 @@ const GLchar* vertexShaderSource = R"(
     layout (location =0) in vec3 vPos;
     layout (location =1) in vec3 vColor;
     layout (location =2) in vec2 uvs;
+    uniform mat4 transform;
     out vec4 outColor;
     void main()
     {
-        gl_Position = vec4(vPos.xyz, 1.0f);
+        gl_Position =  transform * vec4(vPos.xyz, 1.0f);
         outColor = vec4(vColor.xyz, 1.0);
     }
 )";
@@ -34,17 +37,45 @@ const GLchar* fragmentShaderSource = R"(
     }
 )";
 
-class Mesh
+const float cubeVertices[] =
 {
+    1,  1, -1,  // 0: 오른쪽 위 앞
+    1, -1, -1,  // 1: 오른쪽 아래 앞
+   -1, -1, -1,  // 2: 왼쪽 아래 앞
+   -1,  1, -1,  // 3: 왼쪽 위 앞
+    1,  1,  1,  // 4: 오른쪽 위 뒤
+    1, -1,  1,  // 5: 오른쪽 아래 뒤
+   -1, -1,  1,  // 6: 왼쪽 아래 뒤
+   -1,  1,  1   // 7: 왼쪽 위 뒤
 };
 
+const int cubeIndices[] =
+{
+    // 앞면
+    0, 1, 2,
+    0, 2, 3,
+    // 뒷면
+    4, 7, 6,
+    4, 6, 5,
+    // 왼쪽면
+    3, 2, 6,
+    3, 6, 7,
+    // 오른쪽면
+    0, 4, 5,
+    0, 5, 1,
+    // 윗면
+    0, 3, 7,
+    0, 7, 4,
+    // 아랫면
+    1, 5, 6,
+    1, 6, 2
+};
 const GLfloat vertices[] = 
 {
     -0.5f, -0.5f, 0.0f,    1.0f, 0.0f, 0.0f,
     0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
     0.0f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,
 };
-
 
 void DrawTriangle()
 {
@@ -118,20 +149,20 @@ int main()
     */
 
     //Vertex Buffer
-    unsigned int VAO, VBO[2];
+    unsigned int VAO, VBO, EBO;
     
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    glGenBuffers(2, VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -141,18 +172,28 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        unsigned int cID;
+        unsigned int cID, transID;
         cID = glGetUniformLocation(shaderProgram, "uColor");
         float val = glm::abs(glm::sin(glfwGetTime()*0.5f));
         glUniform4f(cID, 0.0f, val, 0.0f, 1.0f);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        transID = glGetUniformLocation(shaderProgram, "transform");
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f,0.1f,0.0f));
+        transform = glm::scale(transform, glm::vec3(0.5f,0.5f,0.5f));
+        glm::mat4 camera = glm::lookAt(glm::vec3(0.0f,5.0f,-5.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
+        glm::mat4 perspective = glm::perspective((float)70.f, (float)WIDTH/HEIGHT, (float)0.1f, (float)1000.0f);
+        transform = perspective * camera * transform;
+        glUniformMatrix4fv(transID, 1, GL_FALSE, glm::value_ptr(transform));
 
+        glBindVertexArray(VAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, sizeof(cubeIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
         glFinish();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    glDeleteBuffers(2, VBO);
+    glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(shaderProgram);
     glfwTerminate();
