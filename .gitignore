@@ -45,5 +45,3 @@ bin
 build
 dependencies
 resources
-
-src/pathTracing_test.cpp

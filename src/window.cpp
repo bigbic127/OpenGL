@@ -1,15 +1,17 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <glm.hpp>
+#include <iostream>
 
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 
 void Framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
+void error_callback(int error, const char* description);
 
 const GLchar* vertexShaderSource = R"(
-    #version 450 core
+    #version 410 core
     layout (location =0) in vec3 vPos;
     layout (location =1) in vec3 vColor;
     layout (location =2) in vec2 uvs;
@@ -22,7 +24,7 @@ const GLchar* vertexShaderSource = R"(
 )";
 
 const GLchar* fragmentShaderSource = R"(
-    #version 450 core
+    #version 410 core
     out vec4 fragColor;
     in vec4 outColor;
     uniform vec4 uColor;
@@ -54,13 +56,19 @@ int main()
     if (!glfwInit())
         return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    #ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
+    glfwSetErrorCallback(error_callback);
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL Window", nullptr, nullptr);
     if (window == nullptr)
     {
         glfwTerminate();
         glfwDestroyWindow(window);
+        std::cout << "faild window" << std::endl;
         return -1;
     }
     glfwMakeContextCurrent(window);
@@ -161,4 +169,8 @@ void ProcessInput(GLFWwindow* window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void error_callback(int error, const char* description) {
+    std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }

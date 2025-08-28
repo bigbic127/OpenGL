@@ -23,7 +23,7 @@ target_include_directories(GLAD_LIB PUBLIC
 set(GLFW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw)
 add_library(GLFW_LIB STATIC IMPORTED)
 set_target_properties(GLFW_LIB PROPERTIES
-    IMPORTED_LOCATION ${GLFW_DIR}/lib-vc2022/glfw3.lib
+    IMPORTED_LOCATION ${GLFW_DIR}/lib-universal/libglfw3.a
     INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
 )
 #GLM 추가
@@ -32,24 +32,38 @@ add_library(GLM_LIB INTERFACE)
 target_include_directories(GLM_LIB INTERFACE
     ${GLW_DIR}
 )
+#STB 추가
+set(STB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/stb)
+add_library(STB_LIB INTERFACE)
+target_include_directories(STB_LIB INTERFACE
+    ${STB_DIR}
+)
 
 if(APPLE)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-    target_link_libraries(${PROJECT_NAME} PUBLIC
-    )
-elseif(WIN32)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
     target_link_libraries(${PROJECT_NAME} PUBLIC
     GLAD_LIB
     GLM_LIB
     GLFW_LIB
+    
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework CoreVideo"
+    "-framework OpenGL"
+    )
+elseif(WIN32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+    GLAD_LIB
+    GLM_LIB
+    GLFW_LIB
+    STB_LIB
     opengl32
     )
 endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY   "${CMAKE_SOURCE_DIR}/bin"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin"
+    OUTPUT_NAME   "${PROJECT_NAME}_debug"
     OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
     OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
 )
