@@ -67,3 +67,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
     OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
 )
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
