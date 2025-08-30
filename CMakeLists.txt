@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Window.cpp"
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -23,14 +23,15 @@ target_include_directories(GLAD_LIB PUBLIC
 set(GLFW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glfw)
 add_library(GLFW_LIB STATIC IMPORTED)
 if(APPLE)
-set_target_properties(GLFW_LIB PROPERTIES
-if(APPLE)
-    IMPORTED_LOCATION ${GLFW_DIR}/lib-universal/libglfw3.a
-else()
-    IMPORTED_LOCATION ${GLFW_DIR}//lib-vc2022/glfw3.lib
-endif()
-    INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
-)
+    set_target_properties(GLFW_LIB PROPERTIES
+        IMPORTED_LOCATION ${GLFW_DIR}/lib-universal/libglfw3.a
+        INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
+    )
+elseif(WIN32)
+    set_target_properties(GLFW_LIB PROPERTIES
+        IMPORTED_LOCATION ${GLFW_DIR}/lib-vc2022/glfw3.lib
+        INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
+    )
 endif()
 #GLM 추가
 set(GLW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm)
