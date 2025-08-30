@@ -73,12 +73,16 @@ const char* vertexShaderSource = R"(
     layout (location = 0) in vec3 vPos;
     layout (location = 1) in vec3 vNor;
     layout (location = 2) in vec2 vUVs;
-    uniform mat4 Transform;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
     out vec2 TexCoord;
+    out vec3 Normal;
     void main()
     {
-        gl_Position = Transform * vec4(vPos.xyz, 1.0f);
+        gl_Position = projection * view * model * vec4(vPos.xyz, 1.0f);
         TexCoord = vUVs;
+        Normal = vNor;
     }
 )";
 
@@ -86,6 +90,7 @@ const GLchar* fragmentShaderSource = R"(
     #version 410 core
     out vec4 fragColor;
     in vec2 TexCoord;
+    in vec3 Normal;
     uniform sampler2D texture1;
     void main()
     {
@@ -193,17 +198,16 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, glm::vec3(0.0f));
-        matrix = glm::rotate(matrix, (float)glfwGetTime(), glm::vec3(0.0, 1.0, 0.0));
-        matrix = glm::scale(matrix, glm::vec3(0.5f));
-        glm::mat4 camera = glm::lookAt(glm::vec3(0.0f,1.0f,-2.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        glm::mat4 perspective = glm::perspective((float)70.0f, (float)WIDTH/HEIGHT, (float)0.1f, (float)1000.0f);
-        matrix =perspective * camera * matrix ;
+        glm::mat4 model(1.0f), view(1.0f), projection(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f));
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0, 1.0, 0.0));
+        model = glm::scale(model, glm::vec3(0.5f));
+        view = glm::lookAt(glm::vec3(0.0f,1.0f,-2.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        projection = glm::perspective((float)70.0f, (float)WIDTH/HEIGHT, (float)0.1f, (float)1000.0f);
         glUseProgram(shaderProgram);
-        unsigned int transformID;
-        transformID = glGetUniformLocation(shaderProgram, "Transform");
-        glUniformMatrix4fv(transformID, 1, GL_FALSE, glm::value_ptr(matrix));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
