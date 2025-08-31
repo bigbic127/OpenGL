@@ -16,7 +16,7 @@ void Error_Callback(int error, const char* description);
 void FrameBufferSize_Callback(GLFWwindow* window, int width, int height);
 void Error_ShaderCompile(int shaderID, std::string type);
 
-glm::vec3 LIGHT_POSTION = glm::vec3(0.0f, 1.0f, -1.5f);
+glm::vec3 LIGHT_POSTION = glm::vec3(1.0f, 1.0f, 0.5f);
 
 float cubeVertices[] = {
     // Front face
@@ -124,21 +124,22 @@ const GLchar* fragmentShaderSource = R"(
     uniform vec3 lightColor;
     uniform vec3 objectColor = vec3(1.0, 1.0, 1.0);;
     uniform sampler2D texture1;
+    uniform sampler2D texture2;
     void main()
     {
-        vec3 ambient = 0.2 * lightColor;        
+        vec3 ambient = 0.4 * lightColor * vec3(texture(texture1, TexCoord).rgb);        
         vec3 normal = normalize(Normal);
         //diffuse
         vec3 lightDir = normalize(lightPos-Model);
         float lightValue  = max(dot(normal,lightDir), 0.0f);
-        vec3 diffuse = lightValue * lightColor;
+        vec3 diffuse = 5.0 * lightValue * lightColor * vec3(texture(texture1, TexCoord).rgb);
         //specular
         vec3 specDir = normalize(viewPos-Model);
         vec3 reflectDir = reflect(-lightDir, normal);
         float reflectValue = pow(max(dot(specDir, reflectDir), 0.0f), 32);
-        vec3 specular = 5.0f * reflectValue * lightColor;
+        vec3 specular = 20.0f * reflectValue * lightColor * vec3(texture(texture2, TexCoord).rgb);
         vec3 result = (ambient + diffuse + specular) * objectColor;
-        FragColor = vec4(result * vec3(texture(texture1, TexCoord).xyz), 1.0f);
+        FragColor = vec4(result, 1.0f);
     }
 )";
 
@@ -201,7 +202,6 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0); // VBO 초기화
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // EBO 초기화
 
-
     unsigned int lightVertexShader, lightFragmentShader, lightShaderProgram;
     lightVertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(lightVertexShader, 1, &lightVertexShaderSource, nullptr);
@@ -248,7 +248,7 @@ int main()
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("../resource/wall.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load("../resource/container2.png", &width, &height, &nrChannels, 0);
     if (!data)
     {
         std::cerr << "Failed to Image Load." << std::endl;
@@ -262,6 +262,31 @@ int main()
     glUniform1i(textureShaderID, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    unsigned int textureID2;
+    glGenTextures(1, &textureID2);
+    glBindTexture(GL_TEXTURE_2D, textureID2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load("../resource/container2_specular.png", &width, &height, &nrChannels, 0);
+    if (!data)
+    {
+        std::cerr << "Failed to Image Load." << std::endl;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    textureShaderID = glGetUniformLocation(shaderProgram, "texture2");
+    glUniform1i(textureShaderID, 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureID2);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -291,21 +316,28 @@ int main()
 
         glm::mat4 lightModel(1.0f);
         lightModel = glm::translate(lightModel, LIGHT_POSTION);
-        lightModel = glm::scale(lightModel, glm::vec3(0.01f));
+        lightModel = glm::scale(lightModel, glm::vec3(0.02f));
         glUseProgram(lightShaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glBindVertexArray(lightVAO);
         glDrawElements(GL_TRIANGLES, sizeof(cubeIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        //텍스쳐 bind
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, textureID2);
 
         glfwSwapBuffers(window);
     }
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
     glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &lightVAO);
     glDeleteTextures(1, &textureID);
     glDeleteProgram(shaderProgram);
+    glDeleteProgram(lightShaderProgram);
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
