@@ -11,12 +11,32 @@
 int WIDTH = 800;
 int HEIGHT = 600;
 
-void WindowResize_Callback(GLFWwindow* window, int width, int height);
 void Error_Callback(int error, const char* description);
-void FrameBufferSize_Callback(GLFWwindow* window, int width, int height);
 void Error_ShaderCompile(int shaderID, std::string type);
+void WindowResize_Callback(GLFWwindow* window, int width, int height);
+void FrameBufferSize_Callback(GLFWwindow* window, int width, int height);
+void ProcessInput(GLFWwindow* window);
+void CursorPos_Callback(GLFWwindow* window, double xpos, double ypos);
+void MouseButton_Callback(GLFWwindow* window, int button, int action, int mods);
+void Scroll_Callback(GLFWwindow*window, double xoffset, double yoffset);
 
-glm::vec3 LIGHT_POSTION = glm::vec3(1.0f, 1.0f, 0.5f);
+glm::vec3 LIGHT_POSTION = glm::vec3(2.0f, 2.0f, 0.5f);
+glm::vec3 Camera_Position = glm::vec3(0.0f,1.0f, 3.0f);
+glm::vec3 Camera_Front = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 Camera_Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float DeltaTime = 0.0f;
+
+bool bMouseLeftClicked = false;
+bool bFirstClicked = false;
+float yaw   = -90.0f;
+float pitch =  0.0f;
+float lastX =  800.0f / 2.0;
+float lastY =  600.0 / 2.0;
+float fov   =  45.0f;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 float cubeVertices[] = {
     // Front face
@@ -71,6 +91,19 @@ unsigned int cubeIndices[] = {
    20,21,22, 22,23,20
 };
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
 const char* lightVertexShaderSource = R"(
     #version 410 core
     layout (location = 0) in vec3 vPos;
@@ -119,6 +152,7 @@ const GLchar* fragmentShaderSource = R"(
     in vec2 TexCoord;
     in vec3 Normal;
     in vec3 Model;
+    uniform vec3 lightDirection = vec3(0.5f, -0.5f, 0.0f);//디렉셔널 라이트
     uniform vec3 lightPos;
     uniform vec3 viewPos;
     uniform vec3 lightColor;
@@ -131,6 +165,7 @@ const GLchar* fragmentShaderSource = R"(
         vec3 normal = normalize(Normal);
         //diffuse
         vec3 lightDir = normalize(lightPos-Model);
+        //lightDir = normalize(-lightDirection); //디렉셔널 라이트
         float lightValue  = max(dot(normal,lightDir), 0.0f);
         vec3 diffuse = 5.0 * lightValue * lightColor * vec3(texture(texture1, TexCoord).rgb);
         //specular
@@ -173,6 +208,9 @@ int main()
     glfwSetErrorCallback(Error_Callback);
     glfwSetWindowSizeCallback(window, WindowResize_Callback);
     glfwSetFramebufferSizeCallback(window, FrameBufferSize_Callback);
+    glfwSetCursorPosCallback(window, CursorPos_Callback);
+    glfwSetMouseButtonCallback(window, MouseButton_Callback);
+    glfwSetScrollCallback(window, Scroll_Callback);
 
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -292,31 +330,41 @@ int main()
 
     while(!glfwWindowShouldClose(window))
     {
-        glfwPollEvents();
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        ProcessInput(window);
+
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        glm::mat4 model(1.0f), view(1.0f), projection(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0, 1.0, 0.0));
-        model = glm::scale(model, glm::vec3(0.5f));
-        view = glm::lookAt(glm::vec3(0.0f,1.0f,-2.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        glm::mat4 view(1.0f), projection(1.0f);
+        view = glm::lookAt(Camera_Position, Camera_Position + Camera_Front, Camera_Up);
         projection = glm::perspective(glm::radians(70.0f), (float)WIDTH/HEIGHT, 0.1f, 1000.0f);
-        glUseProgram(shaderProgram);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, &LIGHT_POSTION[0]);
-        glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), 0.0f, 1.0f, -2.0f);
-        glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, sizeof(cubeIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
+        glBindVertexArray(VAO);
+        glUseProgram(shaderProgram);
+        for (size_t i = 0; i < 10; i++)
+        {
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, (cubePositions[i] * 0.5f));
+            float angle = 20 * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::scale(model, glm::vec3(0.4));
+            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+            glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, &LIGHT_POSTION[0]);
+            glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
+            glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), 0.0f, 1.0f, -2.0f);
+            //glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawElements(GL_TRIANGLES, sizeof(cubeIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        }
         glm::mat4 lightModel(1.0f);
         lightModel = glm::translate(lightModel, LIGHT_POSTION);
-        lightModel = glm::scale(lightModel, glm::vec3(0.02f));
+        lightModel = glm::scale(lightModel, glm::vec3(0.1f));
         glUseProgram(lightShaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -330,6 +378,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, textureID2);
 
         glfwSwapBuffers(window);
+        glfwPollEvents();
     }
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
@@ -343,10 +392,91 @@ int main()
     return 0;
 }
 
-void Error_Callback(int error, const char* description)
+void ProcessInput(GLFWwindow* window)
 {
-    std::cerr <<"Error : " << error << " : " << description << std::endl;
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
+    float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        Camera_Position += cameraSpeed * Camera_Front;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        Camera_Position -= cameraSpeed * Camera_Front;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        Camera_Position -= glm::normalize(glm::cross(Camera_Front, Camera_Up)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        Camera_Position += glm::normalize(glm::cross(Camera_Front, Camera_Up)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        Camera_Position += cameraSpeed * Camera_Up;
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        Camera_Position -= cameraSpeed * Camera_Up;
 }
+
+void MouseButton_Callback(GLFWwindow* window, int button, int action, int mods)
+{
+    //std::cerr << "Button : " << button << " , Action : " << action <<" , Mods: "<<mods<< std::endl;
+    if(glfwGetMouseButton(window, button) == GLFW_PRESS)
+    {
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            if(action == GLFW_PRESS)
+                bMouseLeftClicked = true;
+        }
+    }
+    else
+    {
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            if(action == GLFW_RELEASE)
+            {
+                bMouseLeftClicked = false;
+                bFirstClicked = false;
+            }
+        }        
+    }
+    std::cerr << "Button : " << bMouseLeftClicked << std::endl;
+}
+
+void Scroll_Callback(GLFWwindow*window, double xoffset, double yoffset)
+{
+
+}
+
+void CursorPos_Callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if(bMouseLeftClicked)
+    {
+        float x = static_cast<float>(xpos);
+        float y = static_cast<float>(ypos);
+        if (!bFirstClicked)
+        {
+            bFirstClicked = true;
+            lastX = x;
+            lastY = y;
+        }
+        float offsetX = x - lastX;
+        float offsetY = lastY - y;
+        lastX = x;
+        lastY = y;
+        float sensitivity = 0.1f;
+        offsetX *= sensitivity;
+        offsetY *= sensitivity;
+        yaw += offsetX;
+        pitch += offsetY;
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+        glm::vec3 front;
+        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        front.y = sin(glm::radians(pitch));
+        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        Camera_Front = glm::normalize(front);
+        std::cerr << "CursorPos : " << offsetX << "," << offsetY << std::endl;
+    }
+}
+
 
 void WindowResize_Callback(GLFWwindow* window, int width, int height)
 {
@@ -358,6 +488,11 @@ void WindowResize_Callback(GLFWwindow* window, int width, int height)
 void FrameBufferSize_Callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void Error_Callback(int error, const char* description)
+{
+    std::cerr <<"Error : " << error << " : " << description << std::endl;
 }
 
 void Error_ShaderCompile(int shaderID, std::string type)
