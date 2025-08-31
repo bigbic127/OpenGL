@@ -11,11 +11,12 @@
 int WIDTH = 800;
 int HEIGHT = 600;
 
+void WindowResize_Callback(GLFWwindow* window, int width, int height);
 void Error_Callback(int error, const char* description);
 void FrameBufferSize_Callback(GLFWwindow* window, int width, int height);
 void Error_ShaderCompile(int shaderID, std::string type);
 
-glm::vec3 LIGHT_POSTION = glm::vec3(0.0f, 0.0f, -1.5f);
+glm::vec3 LIGHT_POSTION = glm::vec3(0.0f, 1.0f, -1.5f);
 
 float cubeVertices[] = {
     // Front face
@@ -125,12 +126,18 @@ const GLchar* fragmentShaderSource = R"(
     uniform sampler2D texture1;
     void main()
     {
-        vec3 ambient = 0.2 * lightColor;
+        vec3 ambient = 0.2 * lightColor;        
         vec3 normal = normalize(Normal);
-        vec3 lightDirection = normalize(lightPos-Model);
-        float value  = max(dot(normal,lightDirection), 0.0f);
-        vec3 diffuse = value * lightColor;
-        vec3 result = (ambient + diffuse) * objectColor;
+        //diffuse
+        vec3 lightDir = normalize(lightPos-Model);
+        float lightValue  = max(dot(normal,lightDir), 0.0f);
+        vec3 diffuse = lightValue * lightColor;
+        //specular
+        vec3 specDir = normalize(viewPos-Model);
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float reflectValue = pow(max(dot(specDir, reflectDir), 0.0f), 32);
+        vec3 specular = 5.0f * reflectValue * lightColor;
+        vec3 result = (ambient + diffuse + specular) * objectColor;
         FragColor = vec4(result * vec3(texture(texture1, TexCoord).xyz), 1.0f);
     }
 )";
@@ -163,6 +170,7 @@ int main()
         return -1;
     }
     glfwSetErrorCallback(Error_Callback);
+    glfwSetWindowSizeCallback(window, WindowResize_Callback);
     glfwSetFramebufferSizeCallback(window, FrameBufferSize_Callback);
 
     unsigned int VAO, VBO, EBO;
@@ -275,14 +283,15 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, &LIGHT_POSTION[0]);
-        glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"),1.0f,1.0f,1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), 0.0f, 1.0f, -2.0f);
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, sizeof(cubeIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
         glm::mat4 lightModel(1.0f);
         lightModel = glm::translate(lightModel, LIGHT_POSTION);
-        lightModel = glm::scale(lightModel, glm::vec3(0.05f));
+        lightModel = glm::scale(lightModel, glm::vec3(0.01f));
         glUseProgram(lightShaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -306,6 +315,13 @@ void Error_Callback(int error, const char* description)
 {
     std::cerr <<"Error : " << error << " : " << description << std::endl;
 }
+
+void WindowResize_Callback(GLFWwindow* window, int width, int height)
+{
+    WIDTH = width;
+    HEIGHT = height;
+}
+
 
 void FrameBufferSize_Callback(GLFWwindow* window, int width, int height)
 {
