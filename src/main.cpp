@@ -21,7 +21,7 @@ void MouseButton_Callback(GLFWwindow* window, int button, int action, int mods);
 void Scroll_Callback(GLFWwindow*window, double xoffset, double yoffset);
 
 glm::vec3 LIGHT_POSTION = glm::vec3(2.0f, 2.0f, 0.5f);
-glm::vec3 Camera_Position = glm::vec3(0.0f,1.0f, 3.0f);
+glm::vec3 Camera_Position = glm::vec3(0.0f,0.0f, 3.0f);
 glm::vec3 Camera_Front = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 Camera_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -77,18 +77,18 @@ float cubeVertices[] = {
 };
 
 unsigned int cubeIndices[] = {
-    // Front face
-    0, 1, 2,  2, 3, 0,
-    // Back face
-    4, 5, 6,  6, 7, 4,
-    // Left face
-    8, 9,10, 10,11, 8,
-    // Right face
-   12,13,14, 14,15,12,
+    // Front face (CCW)
+     0, 3, 2,  2, 1, 0,
+    // Back face (CCW)
+     4, 5, 6,  6, 7, 4,
+    // Left face (CCW)
+     8,11,10, 10, 9, 8,
+    // Right face (CCW)
+    12,13,14, 14,15,12,
     // Top face
-   16,17,18, 18,19,16,
+    16,19,18, 18,17,16,
     // Bottom face
-   20,21,22, 22,23,20
+    20,23,22, 22,21,20
 };
 
     glm::vec3 cubePositions[] = {
@@ -159,21 +159,43 @@ const GLchar* fragmentShaderSource = R"(
     uniform vec3 objectColor = vec3(1.0, 1.0, 1.0);;
     uniform sampler2D texture1;
     uniform sampler2D texture2;
+
+    float constant = 1.0f;
+    float linear = 0.7f;
+    float quadratic = 1.8f;
+
+    float cutOff = 0.966;
+    float outerCutOff= 0.953f;
+
     void main()
     {
-        vec3 ambient = 0.4 * lightColor * vec3(texture(texture1, TexCoord).rgb);        
+        vec3 ambient = 0.4 * lightColor * objectColor * vec3(texture(texture1, TexCoord).rgb);
         vec3 normal = normalize(Normal);
         //diffuse
         vec3 lightDir = normalize(lightPos-Model);
         //lightDir = normalize(-lightDirection); //디렉셔널 라이트
+        //lightDir = normalize(vec3(0,0,1) - Model);//스팟(카메라 기준)
         float lightValue  = max(dot(normal,lightDir), 0.0f);
-        vec3 diffuse = 5.0 * lightValue * lightColor * vec3(texture(texture1, TexCoord).rgb);
+        vec3 diffuse = 5.0 * lightValue * lightColor * objectColor * vec3(texture(texture1, TexCoord).rgb);
         //specular
         vec3 specDir = normalize(viewPos-Model);
         vec3 reflectDir = reflect(-lightDir, normal);
         float reflectValue = pow(max(dot(specDir, reflectDir), 0.0f), 32);
-        vec3 specular = 20.0f * reflectValue * lightColor * vec3(texture(texture2, TexCoord).rgb);
-        vec3 result = (ambient + diffuse + specular) * objectColor;
+        vec3 specular = 20.0f * reflectValue * lightColor * objectColor * vec3(texture(texture2, TexCoord).rgb);
+        //attenuation
+        float distance = length(lightPos-Model);
+        float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));    
+        //ambient *= attenuation;
+        //diffuse *= attenuation;
+        //specular *= attenuation;
+        //spotlight (soft edges)
+        float theta = dot(lightDir, normalize(-vec3(0,0,-1))); 
+        float epsilon = (cutOff - outerCutOff);
+        float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
+        //diffuse  *= intensity;
+        //specular *= intensity;
+
+        vec3 result = ambient + diffuse + specular;
         FragColor = vec4(result, 1.0f);
     }
 )";
@@ -327,6 +349,9 @@ int main()
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
 
     while(!glfwWindowShouldClose(window))
     {
