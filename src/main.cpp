@@ -92,7 +92,7 @@ unsigned int cubeIndices[] = {
     // Top face
     16,19,18, 18,17,16,
     // Bottom face
-    20,23,22, 22,21,20
+    22,23,20, 20,21,22
 };
 
     glm::vec3 cubePositions[] = {
@@ -160,7 +160,7 @@ const GLchar* fragmentShaderSource = R"(
     uniform vec3 lightPos;
     uniform vec3 viewPos;
     uniform vec3 lightColor;
-    uniform vec3 objectColor = vec3(1.0, 1.0, 1.0);;
+    uniform vec3 objectColor = vec3(1.0, 1.0, 1.0);
     uniform sampler2D texture1;
     uniform sampler2D texture2;
 

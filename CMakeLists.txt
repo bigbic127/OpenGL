@@ -45,18 +45,18 @@ add_library(STB_LIB INTERFACE)
 target_include_directories(STB_LIB INTERFACE
     ${STB_DIR}
 )
-#AISSMP 추가
-set(AISSMP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/aissmp)
-add_library(AISSMP_LIB STATIC IMPORTED)
+#ASSIMP 추가
+set(ASSIMP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/assimp)
+add_library(ASSIMP_LIB STATIC IMPORTED)
 if(APPLE)
-    set_target_properties(AISSMP_LIB PROPERTIES
-        IMPORTED_LOCATION ${AISSMP_DIR}/lib/assimp-vc143-mt.lib
-        INTERFACE_INCLUDE_DIRECTORIES ${AISSMP_DIR}/include
+    set_target_properties(ASSIMP_LIB PROPERTIES
+        IMPORTED_LOCATION ${ASSIMP_DIR}/lib/libassimp.6.dylib
+        INTERFACE_INCLUDE_DIRECTORIES ${ASSIMP_DIR}/include
     )
 elseif(WIN32)
-    set_target_properties(AISSMP_LIB PROPERTIES
-        IMPORTED_LOCATION ${AISSMP_DIR}/lib/assimp-vc143-mt.lib
-        INTERFACE_INCLUDE_DIRECTORIES ${AISSMP_DIR}/include
+    set_target_properties(ASSIMP_LIB PROPERTIES
+        IMPORTED_LOCATION ${ASSIMP_DIR}/lib/assimp-vc143-mt.lib
+        INTERFACE_INCLUDE_DIRECTORIES ${ASSIMP_DIR}/include
     )
 endif()
 
@@ -67,29 +67,41 @@ if(APPLE)
     GLM_LIB
     GLFW_LIB
     STB_LIB
+    ASSIMP_LIB
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
     "-framework OpenGL"
     )
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY   "${CMAKE_SOURCE_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin"
+        OUTPUT_NAME   "${PROJECT_NAME}_debug"
+        OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
+        OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
+        BUILD_RPATH "@executable_path"
+        INSTALL_RPATH "@executable_path"
+        RPATH_USE_LINK_PATH TRUE
+    )
 elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC
     GLAD_LIB
     GLM_LIB
     GLFW_LIB
     STB_LIB
-    AISSMP_LIB
+    ASSIMP_LIB
     opengl32
     )
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY   "${CMAKE_SOURCE_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin"
+        OUTPUT_NAME   "${PROJECT_NAME}_debug"
+        OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
+        OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
+    )
 endif()
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY   "${CMAKE_SOURCE_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin"
-    OUTPUT_NAME   "${PROJECT_NAME}_debug"
-    OUTPUT_NAME_DEBUG   "${PROJECT_NAME}_debug"
-    OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
-)
 if (MSVC)
     add_compile_options(/utf-8)
 endif()
