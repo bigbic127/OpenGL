@@ -45,6 +45,21 @@ add_library(STB_LIB INTERFACE)
 target_include_directories(STB_LIB INTERFACE
     ${STB_DIR}
 )
+#AISSMP 추가
+set(AISSMP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/aissmp)
+add_library(AISSMP_LIB STATIC IMPORTED)
+if(APPLE)
+    set_target_properties(AISSMP_LIB PROPERTIES
+        IMPORTED_LOCATION ${AISSMP_DIR}/lib/assimp-vc143-mt.lib
+        INTERFACE_INCLUDE_DIRECTORIES ${AISSMP_DIR}/include
+    )
+elseif(WIN32)
+    set_target_properties(AISSMP_LIB PROPERTIES
+        IMPORTED_LOCATION ${AISSMP_DIR}/lib/assimp-vc143-mt.lib
+        INTERFACE_INCLUDE_DIRECTORIES ${AISSMP_DIR}/include
+    )
+endif()
+
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -63,6 +78,7 @@ elseif(WIN32)
     GLM_LIB
     GLFW_LIB
     STB_LIB
+    AISSMP_LIB
     opengl32
     )
 endif()

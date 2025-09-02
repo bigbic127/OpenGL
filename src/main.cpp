@@ -6,6 +6,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <iostream>
 
 int WIDTH = 800;
@@ -233,6 +237,10 @@ int main()
     glfwSetCursorPosCallback(window, CursorPos_Callback);
     glfwSetMouseButtonCallback(window, MouseButton_Callback);
     glfwSetScrollCallback(window, Scroll_Callback);
+
+    Assimp::Importer importer;
+    const aiScene *scene = importer.ReadFile("../resource/bunny.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
+
 
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
