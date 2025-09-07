@@ -143,7 +143,7 @@ const char* vertexShaderSource = R"(
     void main()
     {
         gl_Position = projection * view * model * vec4(vPos.xyz, 1.0f);
-        Normal = mat3(transpose(inverse(model))) * vNor;
+        Normal = transpose(inverse(mat3(model))) * vNor;
         TexCoord = vUVs;
         Model = vec3(model * vec4(vPos.xyz, 1.0f));
 
