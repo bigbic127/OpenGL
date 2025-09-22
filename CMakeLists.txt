@@ -7,8 +7,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp",
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.h",
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cpp",
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/shader.cpp"
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 

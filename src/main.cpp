@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include "mesh.hpp"
+#include "shader.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
@@ -58,93 +59,6 @@ std::vector<unsigned int> cubeIndices = {
     // Bottom face
    20,21,22, 22,23,20
 };
-
-
-class Shader
-{
-    public:
-        Shader(const char* vertexPath, const char* fragmentPath);
-        ~Shader();
-        std::string LoadShaderSource(const std::string& filePath);
-        void UseProgram();
-        void CheckCompileError(int id, std::string type);
-    private:
-        int vertexID, fragmentID, programID;
-    
-};
-
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
-{
-    std::string vertexCode = LoadShaderSource(vertexPath);
-    std::string fragmentCode = LoadShaderSource(fragmentPath);
-
-    const char* vertexSource = vertexCode.c_str();
-    const char* fragmentSource = fragmentCode.c_str();
-    
-    vertexID = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexID, 1, &vertexSource, nullptr);
-    glCompileShader(vertexID);
-    CheckCompileError(vertexID, "VERTEX");
-    fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentID, 1, &fragmentSource, nullptr);
-    glCompileShader(fragmentID);
-    CheckCompileError(fragmentID, "FRAGMENT");
-    programID = glCreateProgram();
-    glAttachShader(programID, vertexID);
-    glAttachShader(programID, fragmentID);
-    glLinkProgram(programID);
-    CheckCompileError(programID, "PROGRAM");
-    glDeleteShader(vertexID);
-    glDeleteShader(fragmentID);
-}
-
-Shader::~Shader()
-{
-    glDeleteProgram(programID);
-}
-
-std::string Shader::LoadShaderSource(const std::string& filePath)
-{
-    std::ifstream file(filePath);
-    if(!file.is_open())
-    {
-        std::cerr << "Failed to open shader file : " << filePath << std::endl;
-        return "";
-    }
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    file.close();
-    return buffer.str();
-}
-
-void Shader::UseProgram()
-{
-    glUseProgram(programID);
-}
-
-void Shader::CheckCompileError(int id, std::string type)
-{
-    int success;
-    char infoLog[512];
-    if (type != "PROGRAM")
-    {
-        glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-        if(!success)
-        {
-            glGetShaderInfoLog(id, 512, nullptr, infoLog);
-            std::cerr << "Failed to " << type << " Shader Compile." << " ID: " << id << ", log: " << infoLog << std::endl;
-        }
-    }
-    else
-    {
-        glGetShaderiv(id, GL_LINK_STATUS, &success);
-        if(!success)
-        {
-            glGetProgramInfoLog(id, 512, nullptr, infoLog);
-            std::cerr << "Failed to Program Compile." << " ID: " << id << ", log: " << infoLog << std::endl;
-        }
-    }
-}
 
 int main()
 {
