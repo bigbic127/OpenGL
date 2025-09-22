@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp",
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.h",
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cpp"
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -59,8 +61,6 @@ elseif(WIN32)
         INTERFACE_INCLUDE_DIRECTORIES ${ASSIMP_DIR}/include
     )
 endif()
-
-
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PUBLIC
     GLAD_LIB
