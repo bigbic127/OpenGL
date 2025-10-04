@@ -20,17 +20,18 @@ class IMesh
 {
     public:
         virtual ~IMesh() = default;
-        virtual void Draw(){};
+        virtual void Draw() = 0;
 };
 
-class Mesh
+class Mesh:public IMesh
 {
     public:
-        Mesh(std::vector<Vertex>vertices, std::vector<unsigned int> indices);
+        Mesh(std::vector<Vertex>& v, std::vector<unsigned int>& i);
         ~Mesh();
         
         void Bind();
         void Unbind();
+        void Draw() override;
     private:
         unsigned int vao, vbo, ebo;
         std::vector<Vertex> vertices;

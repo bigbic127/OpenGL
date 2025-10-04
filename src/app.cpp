@@ -1,6 +1,11 @@
-#include "window.hpp"
-#include "renderer.hpp"
 #include "app.hpp"
+#include "core/window.hpp"
+#include "core/world.hpp"
+#include "core/renderer.hpp"
+#include "core/actor.hpp"
+#include "core/renderer.hpp"
+#include "logger.hpp"
+
 
 std::vector<Vertex> cubeVertices = {
     // Front face
@@ -52,10 +57,21 @@ std::vector<unsigned int> cubeIndices = {
 int main()
 {
     Window window;
+    World world;
+    std::unique_ptr<IRenderer> renderer;
+    renderer = std::make_unique<OpenGLRenderer>();
     if(window.Init())
     {
+        std::shared_ptr<IMesh> cubeMesh =std::make_shared<Mesh>(cubeVertices, cubeIndices);
+        auto actor = world.CreateActor();
+        actor->AddComponent<MeshComponent>(cubeMesh);
+        actor->name = "CubeMeshComponent";
         while(!window.ShouldClose())
         {
+            renderer->Clear();
+            renderer->Begin();
+            renderer->Render(world);
+            renderer->End();
             window.SwapBuffer();
             window.PollEvent();
         }

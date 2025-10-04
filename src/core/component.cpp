@@ -2,5 +2,6 @@
 
 void MeshComponent::Render()
 {
-    mesh->Draw();
+    if (auto m = mesh.lock())
+        m->Draw();
 }
