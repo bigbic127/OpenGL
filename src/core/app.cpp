@@ -1,9 +1,8 @@
 #include "app.hpp"
-#include "core/window.hpp"
-#include "core/world.hpp"
-#include "core/renderer.hpp"
-#include "core/actor.hpp"
-#include "core/renderer.hpp"
+#include "window.hpp"
+#include "scene/world.hpp"
+#include "renderer/renderer.hpp"
+#include "scene/actor.hpp"
 #include "logger.hpp"
 
 

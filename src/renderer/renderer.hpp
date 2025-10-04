@@ -1,7 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include "mesh.hpp"
-#include "world.hpp"
+#include "scene/world.hpp"
 
 class IRenderer
 {

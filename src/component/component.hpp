@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include <glm.hpp>
-#include "mesh.hpp"
-#include "material.hpp"
+#include "renderer/mesh.hpp"
+#include "renderer/material.hpp"
 
 class IComponent
 {

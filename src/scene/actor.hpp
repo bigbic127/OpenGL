@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "component.hpp"
+#include "component/component.hpp"
 
 class Actor
 {
