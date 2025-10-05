@@ -7,6 +7,7 @@ class World
 {
     public:
         Actor* CreateActor();
+        void DeleteActor(Actor* actor);
     private:
         std::vector<std::unique_ptr<Actor>> actors;
 };

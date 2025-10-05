@@ -9,7 +9,6 @@ class Actor
     public:
         Actor(const std::string& n = "Actor"):name(n){}
         std::string name;
-        std::vector<std::unique_ptr<IComponent>> components;
         template<typename T, typename... Args>
             T* AddComponent(Args&&... args)
             {
@@ -28,7 +27,32 @@ class Actor
                 }
                 return nullptr;
             }
+        template<typename T>
+            std::vector<T*> GetComponents()
+            {
+                std::vector<T*> result;
+                for (auto& c:components)
+                {
+                    if(auto casted = dynamic_cast<T*>(c.get()))
+                        result.push_back(casted);
+                }
+                return result;                
+            }
+        template<typename T>
+            T* FindComponent(T* comp)
+            {
+                for(auto& c:components)
+                {
+                    if(auto casted = dynamic_cast<T*>(c.get()))
+                    {
+                        if(casted == comp)
+                            return casted;
+                    }
+                }
+                return nullptr;
+            }
         void Update(float deltaTime);
         void Render();
-
+    private:
+        std::vector<std::unique_ptr<IComponent>> components;
 };

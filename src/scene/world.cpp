@@ -7,3 +7,15 @@ Actor* World::CreateActor()
     actors.push_back(std::move(actor));
     return ptr;
 }
+
+void World::DeleteActor(Actor* actor)
+{
+    actors.erase(
+        std::remove_if(actors.begin(), actors.end(),
+        [actor](const std::unique_ptr<Actor>& a)
+        {
+            return a.get() == actor; 
+        }),
+        actors.end()
+    );
+}
