@@ -2,20 +2,15 @@
 #include <glad/glad.h>
 #include <string>
 
-class IShader
-{
-    public:
-        ~IShader() = default;
-        virtual void UseProgram() = 0;
-};
-
-class Shader:IShader
+class Shader
 {
     public:
         Shader(const char* vsPath, const char* fsPath);
         ~Shader();
+        void UseProgram();
+    protected:
         std::string LoadShaderSource(const std::string& path);
-        void UseProgram() override;
+        void CheckCompileError(unsigned int id, std::string type);
     private:
-        unsigned int programID;
+        unsigned int pID;
 };

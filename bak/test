@@ -1,0 +1,45 @@
+src/
+ ├── Core/                     # 엔진의 기반 시스템
+ │    ├── App.hpp / App.cpp
+ │    ├── Window.hpp / Window.cpp
+ │    ├── Logger.hpp
+ │    ├── Timer.hpp
+ │    └── Input.hpp
+ │
+ ├── Renderer/                 # 렌더링 계층 (RHI, Mesh, Shader 등)
+ │    ├── RHI/                 # API별 추상화 (OpenGL, Vulkan)
+ │    │    ├── OpenGLRenderer.hpp / .cpp
+ │    │    └── VulkanRenderer.hpp / .cpp
+ │    ├── Mesh.hpp / Mesh.cpp
+ │    ├── Material.hpp
+ │    ├── Shader.hpp
+ │    ├── Texture.hpp
+ │    └── Renderer.hpp / Renderer.cpp
+ │
+ ├── Component/                # ECS 컴포넌트
+ │    ├── Component.hpp
+ │    ├── TransformComponent.hpp
+ │    ├── MeshComponent.hpp
+ │    ├── CameraComponent.hpp
+ │    └── LightComponent.hpp
+ │
+ ├── Scene/                    # Actor, World, Scene 관리
+ │    ├── Actor.hpp / .cpp
+ │    ├── World.hpp / .cpp
+ │    └── SceneManager.hpp / .cpp
+ │
+ ├── Resource/                 # 리소스 및 Asset 관리
+ │    ├── Resource.hpp
+ │    ├── TextureLoader.hpp
+ │    ├── MeshLoader.hpp
+ │    └── ResourceManager.hpp
+ │
+ ├── Systems/                  # 런타임 시스템 (ECS와 연결)
+ │    ├── RenderSystem.hpp / .cpp
+ │    ├── PhysicsSystem.hpp / .cpp
+ │    └── InputSystem.hpp / .cpp
+ │
+ └── Utils/                    # 범용 유틸리티
+      ├── Math.hpp
+      ├── StringUtil.hpp
+      └── FileIO.hpp
