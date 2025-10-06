@@ -6,6 +6,6 @@ void MeshComponent::Render()
     {
         m->Bind();
         m->Draw();
-        m->UnBind();
+        m->Unbind();
     }
 }
