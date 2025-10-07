@@ -22,6 +22,7 @@ class Shader:public IShader
         void SetFloat(const std::string& name, float value) const;
         void SetVector3(const std::string& name, const glm::vec3& value) const;
         void SetMatrix4(const std::string& name, const glm::mat4& value) const;
+        GLint GetLocation(const std::string& name) const;
     private:
         unsigned int programID;
 };

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <gtc/type_ptr.hpp>
 #include "core/logger.hpp"
 
 Shader::Shader(const char* vsPath, const char* fspath)
@@ -47,4 +48,19 @@ std::string Shader::LoadShaderSource(const std::string& path)
     buffer << file.rdbuf();
     file.close();
     return buffer.str();
+}
+
+GLint Shader::GetLocation(const std::string& name) const
+{
+    return glGetUniformLocation(programID, name.c_str());
+}
+
+void Shader::SetBool(const std::string& name, bool value) const
+{
+    glUniform1d(GetLocation(name), value);
+}
+
+void Shader::SetVector3(const std::string& name, const glm::vec3& value) const
+{
+    glUniform3fv(GetLocation(name), 1, glm::value_ptr(value));
 }
