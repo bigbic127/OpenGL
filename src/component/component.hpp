@@ -8,11 +8,20 @@ class IComponent
 {
     public:
         virtual ~IComponent() = default;
-        virtual void Update(float deltaTime){};
+        virtual void Update(const float deltaTime){};
         virtual void Render(){};
 };
 
-class MeshComponent:public IComponent
+class SceneComponent:public IComponent
+{
+    private:
+        glm::vec3 position;
+        glm::vec3 rotation;
+        glm::vec3 scale;
+        glm::vec4 quaternion;
+};
+
+class MeshComponent:public SceneComponent
 {
     public:
         MeshComponent(std::shared_ptr<IMesh> m):mesh(m){}
@@ -24,18 +33,6 @@ class MeshComponent:public IComponent
     private:
         std::weak_ptr<IMesh> mesh;
         std::weak_ptr<Material> material;
-};
-
-class TransformComponent:public IComponent
-{
-    public:
-        void Update(float deltaTime) override;
-        glm::mat4 GetMatrix();
-    private:
-        glm::vec3 position;
-        glm::vec3 rotation;
-        glm::vec3 scale;
-        glm::vec4 quaternion;
 };
 
 class CameraComponent:public IComponent

@@ -16,5 +16,8 @@ class Material:public IMaterial
         void Apply() override;
     private:
         std::weak_ptr<Shader> shader;
+        glm::mat4 mModel = glm::mat4(1.0);
+        glm::mat4 mView = glm::mat4(1.0);
+        glm::mat4 mProjection = glm::mat4(1.0);
         glm::vec3 baseColor = glm::vec3(1.0);
 };

@@ -65,6 +65,11 @@ int main()
         auto actor = world.CreateActor();
         actor->AddComponent<MeshComponent>(cubeMesh);
         actor->name = "CubeMeshComponent";
+        std::string vertexShaderPath = "/shader/standard.vert";
+        std::string fragShaderPath = "/shader/standard.frag";
+        std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexShaderPath, fragShaderPath);
+        std::shared_ptr<Material> material = std::make_shared<Material>(shader);
+        actor->GetComponent<MeshComponent>()->SetMaterial(material);
         while(!window.ShouldClose())
         {
             renderer->Clear();

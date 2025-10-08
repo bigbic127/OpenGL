@@ -13,7 +13,7 @@ class IShader
 class Shader:public IShader
 {
     public:
-        Shader(const char* vsPath, const char* fsPath);
+        Shader(const std::string& vsPath, const std::string& fsPath);
         ~Shader();
         std::string LoadShaderSource(const std::string& path);
         void UseProgram() override;

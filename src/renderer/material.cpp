@@ -6,6 +6,9 @@ void Material::Apply()
     if(auto s = shader.lock())
     {
         s->UseProgram();
+        s->SetMatrix4("mModel", mModel);
+        s->SetMatrix4("mView", mView);
+        s->SetMatrix4("mProjection", mProjection);
         s->SetVector3("baseColor", baseColor);
     }
 }
