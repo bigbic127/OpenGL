@@ -70,8 +70,18 @@ int main()
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexShaderPath, fragShaderPath);
         std::shared_ptr<Material> material = std::make_shared<Material>(shader);
         actor->GetComponent<MeshComponent>()->SetMaterial(material);
+        //actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.25f,1.0f,0.5f));
+        auto cameraActor = world.CreateActor();
+        cameraActor->name = "Camera";
+        cameraActor->AddComponent<CameraComponent>();
+        CameraComponent* component = cameraActor->GetComponent<CameraComponent>();
+        actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
+        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
         while(!window.ShouldClose())
         {
+            glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
+            rot.y += 1;
+            actor->GetComponent<MeshComponent>()->SetRotation(rot);
             renderer->Clear();
             renderer->Begin();
             renderer->Render(world);

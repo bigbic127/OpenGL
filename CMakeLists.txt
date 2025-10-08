@@ -108,3 +108,11 @@ endif()
 if (MSVC)
     add_compile_options(/utf-8)
 endif()
+set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/shader")
+set(SHADER_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/shader")
+add_custom_target(copy_shaders ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${SHADER_SOURCE_DIR}
+            ${SHADER_OUTPUT_DIR}
+    COMMENT "Copying shaders..."
+)

@@ -43,10 +43,8 @@ void Shader::UseProgram()
 std::string Shader::LoadShaderSource(const std::string& path)
 {
     std::string p = path;
-    #ifdef __APPLE__
-        std::string root = GetExecutableDir();
-        p = root + path;
-    #endif
+    std::string root = GetExecutableDir();
+    p = root + path;
     std::ifstream file(p);
     if(!file.is_open())
     {

@@ -13,6 +13,9 @@ class Material:public IMaterial
 {
     public:
         Material(std::shared_ptr<Shader> s):shader(s){}
+        void SetModelMatrix(glm::mat4 m){mModel = m;}
+        void SetViewMatrix(glm::mat4 m){mView = m;}
+        void SetProjectMatrix(glm::mat4 m){mProjection = m;}
         void Apply() override;
     private:
         std::weak_ptr<Shader> shader;
