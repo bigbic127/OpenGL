@@ -60,9 +60,13 @@ class MeshComponent:public SceneComponent
 class CameraComponent:public SceneComponent
 {
     public:
-        glm::mat4 GetViewMatrix();
-        glm::mat4 GetProjectionMatrix();
+        glm::mat4 GetViewMatrix()const{return view;}
+        glm::mat4 GetProjectionMatrix()const{return projection;}
+        void SetAspect(float a){aspect = a;}
+        void Update(float deltaTime) override;
     private:
+        glm::mat4 view{1.0f};
+        glm::mat4 projection{1.0f};
         float fov{45.0f};
         glm::vec3 target{0.0f, 0.0f, 0.0f};
         glm::vec3 front{0.0f, 0.0f, -1.0f};

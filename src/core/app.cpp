@@ -77,11 +77,15 @@ int main()
         CameraComponent* component = cameraActor->GetComponent<CameraComponent>();
         actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
         cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
+
         while(!window.ShouldClose())
         {
+            cameraActor->GetComponent<CameraComponent>()->SetAspect(window.GetAspect());
             glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
             rot.y += 1;
             actor->GetComponent<MeshComponent>()->SetRotation(rot);
+            
+            world.Update();
             renderer->Clear();
             renderer->Begin();
             renderer->Render(world);

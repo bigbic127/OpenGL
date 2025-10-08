@@ -28,6 +28,7 @@ bool Window::Init()
         return false;
     }
     glfwMakeContextCurrent(window);
+    glfwSetWindowUserPointer(window, this);
     glfwSetErrorCallback(Logger::WindowErrorCallback);
     glfwSetWindowSizeCallback(window, Window::WindowResizeCallback);
     glfwSetFramebufferSizeCallback(window, Window::FrameBufferSizeCallback);
@@ -56,9 +57,9 @@ bool Window::ShouldClose()
 
 void Window::WindowResizeCallback(GLFWwindow* window, int w, int h)
 {
-    Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    self->width = w;
-    self->height = h;
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    win->width = w;
+    win->height = h;
 }
 
 void Window::FrameBufferSizeCallback(GLFWwindow* window, int w, int h)

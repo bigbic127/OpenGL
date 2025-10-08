@@ -11,6 +11,7 @@ class World
         const std::vector<std::unique_ptr<Actor>>& GetActors(){return actors;}
         const float GetDeltaTime()const{return deltaTime;}
         void SetDeltaTime(float time){deltaTime = time;}
+        void Update();
     private:
         std::vector<std::unique_ptr<Actor>> actors;
         float deltaTime;

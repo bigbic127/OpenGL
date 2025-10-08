@@ -19,3 +19,11 @@ void World::DeleteActor(Actor* actor)
         actors.end()
     );
 }
+
+void World::Update()
+{
+    for(const auto& actor:GetActors())
+    {
+        actor->Update(GetDeltaTime());
+    }
+}

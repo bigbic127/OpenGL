@@ -41,16 +41,8 @@ void MeshComponent::Render()
     }
 }
 
-glm::mat4 CameraComponent::GetViewMatrix()
+void CameraComponent::Update(float deltaTime)
 {
-    glm::mat4 view(1.0f);
     view = glm::lookAt(transform.position, target, up);
-    return view;
-}
-
-glm::mat4 CameraComponent::GetProjectionMatrix()
-{
-    glm::mat4 projection(1.0f);
     projection = glm::perspective(glm::radians(fov), aspect, near, far);
-    return projection;
 }

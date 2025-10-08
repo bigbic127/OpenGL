@@ -14,7 +14,6 @@ void OpenGLRenderer::Render(World& world)
 {
     for(const auto& actor:world.GetActors())
     {
-        actor->Update(world.GetDeltaTime());
         actor->Render();
     }
 }
