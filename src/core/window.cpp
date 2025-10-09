@@ -20,6 +20,7 @@ bool Window::Init()
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
     window = glfwCreateWindow(width, height, "OpengGL", nullptr, nullptr);
     if (window == nullptr)
     {
@@ -65,4 +66,10 @@ void Window::WindowResizeCallback(GLFWwindow* window, int w, int h)
 void Window::FrameBufferSizeCallback(GLFWwindow* window, int w, int h)
 {
     glViewport(0, 0, w, h);
+}
+
+float Window::GetAspect()
+{
+    glfwGetFramebufferSize(window, &width, &height);
+    return float(width)/height;
 }

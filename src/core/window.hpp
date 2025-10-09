@@ -5,7 +5,7 @@
 class Window
 {
     public:
-        Window(int w = 800, int h = 600):width(w), height(h){}
+        Window(int w = 1920, int h = 1080):width(w), height(h){}
         ~Window();
         bool Init();
         bool ShouldClose();
@@ -14,7 +14,7 @@ class Window
         //Callback
         static void WindowResizeCallback(GLFWwindow* window, int w, int h);
         static void FrameBufferSizeCallback(GLFWwindow* window, int w, int h);
-        float GetAspect(){return float(width)/height;}
+        float GetAspect();
     private:
         int width, height;
         GLFWwindow* window = nullptr;

@@ -41,6 +41,7 @@ class SceneComponent:public IComponent
         glm::quat quaternion{1.0f, 0.0f, 0.0f, 0.0f};
 };
 class CameraComponent;
+class LightComponent;
 class MeshComponent:public SceneComponent
 {
     public:
@@ -77,6 +78,12 @@ class CameraComponent:public SceneComponent
 };
 
 class LightComponent:public SceneComponent
+{
+    private:
+        glm::vec3 color{1.0f, 1.0f, 1.0f};
+};
+
+class DirectionalLightComponent:public LightComponent
 {
 
 };

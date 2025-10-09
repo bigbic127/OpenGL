@@ -7,6 +7,7 @@ class IRenderer
 {
     public:
         virtual ~IRenderer() = default;
+        virtual void Init() = 0;
         virtual void Clear() = 0;
         virtual void Begin() = 0;
         virtual void Render(World& world) = 0;
@@ -16,6 +17,7 @@ class IRenderer
 class OpenGLRenderer:public IRenderer
 {
     public:
+        void Init() override;
         void Clear() override;
         void Begin() override;
         void Render(World& world) override;
