@@ -14,6 +14,7 @@ uniform vec3 cameraPosition;
 uniform vec3 ambientColor = vec3(0.0f, 0.0f, 0.0);
 uniform vec3 baseColor = vec3(1.0f, 1.0f, 1.0f);
 //texture
+uniform bool bDiffuse = false;
 uniform sampler2D diffuseTexture;
 
 void main()
@@ -25,8 +26,11 @@ void main()
     //ambient
     vec3 ambient = ambientColor * baseColor * lightColor;
     //difuse
-    vec3 diffuse = lightIntensity * lightValue * baseColor * vec3(texture(diffuseTexture, fragTexCoord).rgb);
+    vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
+    if(bDiffuse)
+        diffuseColor = vec3(texture(diffuseTexture, fragTexCoord).rgb);
+    vec3 diffuseResult = lightIntensity * lightValue * baseColor * diffuseColor;
 
-    vec3 finalColor = ambient + diffuse;
+    vec3 finalColor = ambient + diffuseResult;
     FragColor = vec4(finalColor,1.0);
 }

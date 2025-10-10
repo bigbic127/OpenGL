@@ -61,10 +61,7 @@ int main()
     renderer = std::make_unique<OpenGLRenderer>();
     if(window.Init())
     {
-        std::shared_ptr<IMesh> cubeMesh =std::make_shared<Mesh>(cubeVertices, cubeIndices);
-        auto actor = world.CreateActor();
-        actor->AddComponent<MeshComponent>(cubeMesh);
-        actor->name = "CubeMeshComponent";
+        //source
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
         std::string diffuseTexturePath = "/assets/container2.png";
@@ -72,14 +69,34 @@ int main()
         std::shared_ptr<Material> material = std::make_shared<Material>(shader);
         std::shared_ptr<Texture> texture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath), 0);
         material->AddTexture(texture, "diffuseTexture");
-        actor->GetComponent<MeshComponent>()->SetMaterial(material);
-        //actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.25f,1.0f,0.5f));
+        std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(shader);
+        //material parameter
+        material->SetDiffuseTexture(true);
+        lightMaterial->SetBaseColor(glm::vec3(1.0f, 0.0f, 0.0f));
+        lightMaterial->SetAmbientColor(glm::vec3(1.0f, 1.0f, 1.0f));
+        //camera
         auto cameraActor = world.CreateActor();
         cameraActor->name = "Camera";
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* component = cameraActor->GetComponent<CameraComponent>();
-        actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
         cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
+        //mesh
+        std::shared_ptr<IMesh> cubeMesh =std::make_shared<Mesh>(cubeVertices, cubeIndices);
+        auto actor = world.CreateActor();
+        actor->name = "CubeMeshComponent";
+        actor->AddComponent<MeshComponent>(cubeMesh);
+        actor->GetComponent<MeshComponent>()->SetMaterial(material);
+        actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
+        //actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.25f,1.0f,0.5f));
+        //light
+        auto lightActor = world.CreateActor();
+        lightActor->name = "Light";
+        lightActor->AddComponent<MeshComponent>(cubeMesh);
+        lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+        lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
+        lightActor->GetComponent<MeshComponent>()->SetMaterial(lightMaterial);
+        lightActor->GetComponent<MeshComponent>()->SetCameraComponent(component);
+
         renderer->Init();
         while(!window.ShouldClose())
         {

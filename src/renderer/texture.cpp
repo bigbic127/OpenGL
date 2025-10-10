@@ -31,7 +31,6 @@ void Texture::Init(std::shared_ptr<Shader> shader, std::string& name)
     locationID = shader->GetLocation(name);
     glUniform1i(locationID, unitIndex);
     glActiveTexture(GL_TEXTURE0 + unitIndex);
-    glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
 void Texture::Bind()

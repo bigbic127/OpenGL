@@ -34,10 +34,15 @@ void MeshComponent::Render()
                 mat->SetViewMatrix(cameraComponent->GetViewMatrix());
                 mat->SetProjectMatrix(cameraComponent->GetProjectionMatrix());
             }
-            mat->Apply();
+            mat->Bind();
         }
         m->Draw();
         m->Unbind();
+        if(auto mat = material.lock())
+        {
+            mat->Unbind();
+        }
+
     }
 }
 
