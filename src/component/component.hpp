@@ -51,11 +51,14 @@ class MeshComponent:public SceneComponent
         void SetMaterial(std::shared_ptr<Material> mat){material = mat;}
         std::weak_ptr<Material> GetMaterial() const{return material;}
         void SetCameraComponent(CameraComponent* component){cameraComponent = component;}
+        void SetLightComponent(LightComponent* component){lightComponent = component;}
         void Render() override;
     private:
         std::weak_ptr<IMesh> mesh;
         std::weak_ptr<Material> material;
-        CameraComponent* cameraComponent;
+        CameraComponent* cameraComponent = nullptr;
+        LightComponent* lightComponent =  nullptr;
+        
 };
 
 class CameraComponent:public SceneComponent
@@ -81,6 +84,9 @@ class LightComponent:public SceneComponent
 {
     public:
         void SetIntensity(float value){lightIntensity = value;}
+        void SetColor(glm::vec3 c){color = c;}
+        float GetIntensity() const{return lightIntensity;}
+        glm::vec3 GetColor() const{return color;}
     private:
         float lightIntensity = 1.0f;
         glm::vec3 color{1.0f, 1.0f, 1.0f};

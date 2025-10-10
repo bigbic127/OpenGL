@@ -27,6 +27,11 @@ void Material::Bind()
         s->SetMatrix4("mModel", mModel);
         s->SetMatrix4("mView", mView);
         s->SetMatrix4("mProjection", mProjection);
+        //Light
+        s->SetVector3("lightPosition", vLightPosition);
+        s->SetVector3("directionalLight", vLightDirectional);
+        s->SetFloat("lightIntensity", fLightIntensity);
+        s->SetVector3("lightColor", vLightColor);
         //Parameter
         Apply();
     }

@@ -34,6 +34,12 @@ void MeshComponent::Render()
                 mat->SetViewMatrix(cameraComponent->GetViewMatrix());
                 mat->SetProjectMatrix(cameraComponent->GetProjectionMatrix());
             }
+            if(lightComponent != nullptr)
+            {
+                mat->SetLightPosition(lightComponent->GetPosition());
+                mat->SetLightIntensity(lightComponent->GetIntensity());
+                mat->SetLightColor(lightComponent->GetColor());
+            }
             mat->Bind();
         }
         m->Draw();

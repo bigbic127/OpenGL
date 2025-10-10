@@ -62,6 +62,7 @@ int main()
     if(window.Init())
     {
         //source
+        std::shared_ptr<IMesh> cubeMesh =std::make_shared<Mesh>(cubeVertices, cubeIndices);
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
         std::string diffuseTexturePath = "/assets/container2.png";
@@ -78,16 +79,8 @@ int main()
         auto cameraActor = world.CreateActor();
         cameraActor->name = "Camera";
         cameraActor->AddComponent<CameraComponent>();
-        CameraComponent* component = cameraActor->GetComponent<CameraComponent>();
+        CameraComponent* cameraComponent = cameraActor->GetComponent<CameraComponent>();
         cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
-        //mesh
-        std::shared_ptr<IMesh> cubeMesh =std::make_shared<Mesh>(cubeVertices, cubeIndices);
-        auto actor = world.CreateActor();
-        actor->name = "CubeMeshComponent";
-        actor->AddComponent<MeshComponent>(cubeMesh);
-        actor->GetComponent<MeshComponent>()->SetMaterial(material);
-        actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
-        //actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.25f,1.0f,0.5f));
         //light
         auto lightActor = world.CreateActor();
         lightActor->name = "Light";
@@ -95,8 +88,20 @@ int main()
         lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
         lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
         lightActor->GetComponent<MeshComponent>()->SetMaterial(lightMaterial);
-        lightActor->GetComponent<MeshComponent>()->SetCameraComponent(component);
-
+        lightActor->GetComponent<MeshComponent>()->SetCameraComponent(cameraComponent);
+        lightActor->AddComponent<LightComponent>();
+        lightActor->GetComponent<LightComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
+        LightComponent* lightComponent = lightActor->GetComponent<LightComponent>();
+        //mesh
+        auto actor = world.CreateActor();
+        actor->name = "CubeMeshComponent";
+        actor->AddComponent<MeshComponent>(cubeMesh);
+        actor->GetComponent<MeshComponent>()->SetMaterial(material);
+        actor->GetComponent<MeshComponent>()->SetCameraComponent(cameraComponent);
+        actor->GetComponent<MeshComponent>()->SetLightComponent(lightComponent);
+        
+        lightComponent->SetIntensity(5.0f);
+        
         renderer->Init();
         while(!window.ShouldClose())
         {
