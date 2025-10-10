@@ -22,7 +22,7 @@ void OpenGLRenderer::Render(World& world)
 {
     for(const auto& actor:world.GetActors())
     {
-        actor->Render();
+        actor->Render(world.GetCurrentCamera(), world.GetLights());
     }
 }
 

@@ -6,6 +6,9 @@
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
 
+class CameraComponent;
+class LightComponent;
+
 struct Transform
 {
     glm::vec3 position{0.0f, 0.0f, 0.0f};
@@ -18,7 +21,7 @@ class IComponent
     public:
         virtual ~IComponent() = default;
         virtual void Update(const float deltaTime){};
-        virtual void Render(){};
+        virtual void Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights){};
 };
 
 class SceneComponent:public IComponent
@@ -40,8 +43,7 @@ class SceneComponent:public IComponent
     private:
         glm::quat quaternion{1.0f, 0.0f, 0.0f, 0.0f};
 };
-class CameraComponent;
-class LightComponent;
+
 class MeshComponent:public SceneComponent
 {
     public:
@@ -50,14 +52,10 @@ class MeshComponent:public SceneComponent
         std::weak_ptr<IMesh> GetMesh() const{return mesh;}
         void SetMaterial(std::shared_ptr<Material> mat){material = mat;}
         std::weak_ptr<Material> GetMaterial() const{return material;}
-        void SetCameraComponent(CameraComponent* component){cameraComponent = component;}
-        void SetLightComponent(LightComponent* component){lightComponent = component;}
-        void Render() override;
+        void Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights) override;
     private:
         std::weak_ptr<IMesh> mesh;
         std::weak_ptr<Material> material;
-        CameraComponent* cameraComponent = nullptr;
-        LightComponent* lightComponent =  nullptr;
         
 };
 

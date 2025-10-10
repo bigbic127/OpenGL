@@ -88,7 +88,6 @@ int main()
         lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
         lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
         lightActor->GetComponent<MeshComponent>()->SetMaterial(lightMaterial);
-        lightActor->GetComponent<MeshComponent>()->SetCameraComponent(cameraComponent);
         lightActor->AddComponent<LightComponent>();
         lightActor->GetComponent<LightComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
         LightComponent* lightComponent = lightActor->GetComponent<LightComponent>();
@@ -97,11 +96,14 @@ int main()
         actor->name = "CubeMeshComponent";
         actor->AddComponent<MeshComponent>(cubeMesh);
         actor->GetComponent<MeshComponent>()->SetMaterial(material);
-        actor->GetComponent<MeshComponent>()->SetCameraComponent(cameraComponent);
-        actor->GetComponent<MeshComponent>()->SetLightComponent(lightComponent);
-        
+        //World Setting
+        world.SetCurrentCamera(cameraComponent);
+        world.AddLight(lightComponent);
+
         lightComponent->SetIntensity(5.0f);
-        
+        lightComponent->SetColor(glm::vec3(1.0f,0.0f,0.0f));
+
+
         renderer->Init();
         while(!window.ShouldClose())
         {

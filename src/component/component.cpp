@@ -21,7 +21,7 @@ void SceneComponent::ToEuler()
     transform.rotation = glm::degrees(glm::eulerAngles(glm::normalize(quaternion)));
 }
 
-void MeshComponent::Render()
+void MeshComponent::Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights)
 {
     if(auto m = mesh.lock())
     {
@@ -29,16 +29,15 @@ void MeshComponent::Render()
         if(auto mat = material.lock())
         {
             mat->SetModelMatrix(GetMatrix());
-            if(cameraComponent != nullptr)
+            //camera
+            mat->SetViewMatrix(currentCamera->GetViewMatrix());
+            mat->SetProjectMatrix(currentCamera->GetProjectionMatrix());
+            //light
+            for(auto& light:lights)
             {
-                mat->SetViewMatrix(cameraComponent->GetViewMatrix());
-                mat->SetProjectMatrix(cameraComponent->GetProjectionMatrix());
-            }
-            if(lightComponent != nullptr)
-            {
-                mat->SetLightPosition(lightComponent->GetPosition());
-                mat->SetLightIntensity(lightComponent->GetIntensity());
-                mat->SetLightColor(lightComponent->GetColor());
+                mat->SetLightPosition(light->GetPosition());
+                mat->SetLightIntensity(light->GetIntensity());
+                mat->SetLightColor(light->GetColor());
             }
             mat->Bind();
         }

@@ -29,7 +29,7 @@ void main()
     vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
     if(bDiffuse)
         diffuseColor = vec3(texture(diffuseTexture, fragTexCoord).rgb);
-    vec3 diffuseResult = lightIntensity * lightValue * baseColor * diffuseColor;
+    vec3 diffuseResult = lightIntensity * lightValue * lightColor  * baseColor * diffuseColor;
 
     vec3 finalColor = ambient + diffuseResult;
     FragColor = vec4(finalColor,1.0);

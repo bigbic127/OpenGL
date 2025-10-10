@@ -6,8 +6,8 @@ void Actor::Update(float deltaTime)
         c->Update(deltaTime);
 }
 
-void Actor::Render()
+void Actor::Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights)
 {
     for(auto& c:components)
-        c->Render();
+        c->Render(currentCamera, lights);
 }

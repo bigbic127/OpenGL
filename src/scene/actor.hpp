@@ -52,7 +52,7 @@ class Actor
                 return nullptr;
             }
         void Update(float deltaTime);
-        void Render();
+        void Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights);
     private:
         std::vector<std::unique_ptr<IComponent>> components;
 };
