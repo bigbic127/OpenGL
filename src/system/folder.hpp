@@ -24,3 +24,11 @@
         return std::filesystem::path(path).parent_path().string();
     }
 #endif
+
+static std::string GetFullPath(const std::string& path)
+{
+    std::string p = path;
+    std::string root = GetExecutableDir();
+    p = root + path;
+    return p;
+}

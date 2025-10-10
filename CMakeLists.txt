@@ -38,6 +38,24 @@ elseif(WIN32)
         INTERFACE_INCLUDE_DIRECTORIES ${GLFW_DIR}/include
     )
 endif()
+#IMGUI 추가
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui)
+set(IMGUI_SRC 
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+add_library(IMGUI_LIB STATIC ${IMGUI_SRC})
+target_include_directories(IMGUI_LIB PUBLIC
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+)
+target_compile_definitions(IMGUI_LIB PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+target_link_libraries(IMGUI_LIB PUBLIC GLFW_LIB)
 #GLM 추가
 set(GLW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glm)
 add_library(GLM_LIB INTERFACE)
@@ -69,6 +87,7 @@ if(APPLE)
     GLAD_LIB
     GLM_LIB
     GLFW_LIB
+    IMGUI_LIB
     STB_LIB
     ASSIMP_LIB
     "-framework Cocoa"
@@ -92,6 +111,7 @@ elseif(WIN32)
     GLAD_LIB
     GLM_LIB
     GLFW_LIB
+    IMGUI_LIB
     STB_LIB
     ASSIMP_LIB
     opengl32

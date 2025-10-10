@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "shader.hpp"
+#include "texture.hpp"
 
 class IMaterial
 {
@@ -16,9 +18,11 @@ class Material:public IMaterial
         void SetModelMatrix(glm::mat4 m){mModel = m;}
         void SetViewMatrix(glm::mat4 m){mView = m;}
         void SetProjectMatrix(glm::mat4 m){mProjection = m;}
+        void AddTexture(std::shared_ptr<Texture> texture, std::string name);
         void Apply() override;
     private:
         std::weak_ptr<Shader> shader;
+        std::vector<std::weak_ptr<Texture>> textures;
         glm::mat4 mModel = glm::mat4(1.0);
         glm::mat4 mView = glm::mat4(1.0);
         glm::mat4 mProjection = glm::mat4(1.0);

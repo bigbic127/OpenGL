@@ -4,6 +4,7 @@
 #include "renderer/renderer.hpp"
 #include "scene/actor.hpp"
 #include "logger.hpp"
+#include "system/folder.hpp"
 
 std::vector<Vertex> cubeVertices = {
     // Front face
@@ -66,8 +67,11 @@ int main()
         actor->name = "CubeMeshComponent";
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
+        std::string diffuseTexturePath = "/assets/container2.png";
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexShaderPath, fragShaderPath);
         std::shared_ptr<Material> material = std::make_shared<Material>(shader);
+        std::shared_ptr<Texture> texture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath), 0);
+        material->AddTexture(texture, "diffuseTexture");
         actor->GetComponent<MeshComponent>()->SetMaterial(material);
         //actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.25f,1.0f,0.5f));
         auto cameraActor = world.CreateActor();
@@ -75,8 +79,7 @@ int main()
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* component = cameraActor->GetComponent<CameraComponent>();
         actor->GetComponent<MeshComponent>()->SetCameraComponent(component);
-        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 5.0f, -10.0f));
-
+        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
         renderer->Init();
         while(!window.ShouldClose())
         {
