@@ -14,9 +14,11 @@ int main()
     renderer = std::make_unique<OpenGLRenderer>();
     if(window.Init())
     {
-        //source
+        //source_mesh
         std::shared_ptr<IMesh> cubeMesh =std::make_shared<CubeMesh>();
         std::shared_ptr<IMesh> sphereMesh = std::make_shared<ShpereMesh>(32,32,1.0f);
+        std::shared_ptr<IMesh> coneMesh = std::make_shared<ConeMesh>(32,1.0f,1.0f);
+        //source_shader
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
         std::string diffuseTexturePath = "/assets/container2.png";
@@ -35,11 +37,14 @@ int main()
         //light material
         std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(shader);
         //material parameter
+        standardMaterial->SetBaseColor(glm::vec3(0.2f, 0.1f, 0.1f));
+        standardMaterial->SetAmbientColor(glm::vec3(1.0f));
         material->SetDiffuseTexture(true);
+        material->SetAmbientColor(glm::vec3(0.5f));
         moonMaterial->SetDiffuseTexture(true);
-        moonMaterial->SetBaseColor(glm::vec3(0.3f,0.3f,0.3f));
-        lightMaterial->SetBaseColor(glm::vec3(1.0f, 1.0f, 1.0f));
-        lightMaterial->SetAmbientColor(glm::vec3(1.0f, 1.0f, 1.0f));
+        moonMaterial->SetBaseColor(glm::vec3(0.3f));
+        lightMaterial->SetBaseColor(glm::vec3(1.0f));
+        lightMaterial->SetAmbientColor(glm::vec3( 1.0f));
         //camera
         auto cameraActor = world.CreateActor();
         cameraActor->name = "Camera";
@@ -49,12 +54,14 @@ int main()
         //light
         auto lightActor = world.CreateActor();
         lightActor->name = "Light";
-        lightActor->AddComponent<MeshComponent>(cubeMesh);
-        lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
-        lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
+        glm::vec3 rot = {0.0f, 0.0f, 45.0f};
+        lightActor->AddComponent<MeshComponent>(coneMesh);
+        lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.05f, -0.5f, 0.05f));
+        lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 3.0f, 1.0f));
+        lightActor->GetComponent<MeshComponent>()->SetRotation(rot);
         lightActor->GetComponent<MeshComponent>()->SetMaterial(lightMaterial);
         lightActor->AddComponent<LightComponent>();
-        lightActor->GetComponent<LightComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 1.0f));
+        lightActor->GetComponent<LightComponent>()->SetRotation(rot);
         LightComponent* lightComponent = lightActor->GetComponent<LightComponent>();
         //mesh
         auto actor = world.CreateActor();

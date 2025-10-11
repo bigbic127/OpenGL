@@ -7,7 +7,7 @@ in vec2 fragTexCoord;
 uniform vec3 lightPosition;
 uniform float lightIntensity = 1.0f;
 uniform vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
-uniform vec3 directionalLight = vec3(1.0f, 1.0f, -1.0f);
+uniform vec3 directionalLight = vec3(0.0f, 1.0f, 0.0f);
 //camera
 uniform vec3 cameraPosition;
 //parameter
@@ -19,16 +19,17 @@ uniform sampler2D diffuseTexture;
 
 void main()
 {
-    vec3 normal = normalize(fragNormal);
-    //light
-    vec3 lightDir = normalize(directionalLight);
-    float lightValue = max(dot(normal, lightDir),0.0f);
-    //ambient
-    vec3 ambient = ambientColor * baseColor * lightColor;
-    //difuse
+    //diffuseTexture
     vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
     if(bDiffuse)
         diffuseColor = vec3(texture(diffuseTexture, fragTexCoord).rgb);
+    //light
+    vec3 normal = normalize(fragNormal);
+    vec3 lightDir = normalize(directionalLight);
+    float lightValue = max(dot(normal, lightDir),0.0f);
+    //ambient
+    vec3 ambient = lightColor * ambientColor * baseColor * diffuseColor;
+    //difuse
     vec3 diffuseResult = lightIntensity * lightValue * lightColor  * baseColor * diffuseColor;
 
     vec3 finalColor = ambient + diffuseResult;

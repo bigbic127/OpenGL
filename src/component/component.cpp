@@ -1,5 +1,6 @@
 #include "component.hpp"
 #include <iostream>
+
 glm::mat4 SceneComponent::GetMatrix() const
 {
     glm::mat4 model(1.0f);
@@ -21,6 +22,18 @@ void SceneComponent::ToEuler()
     transform.rotation = glm::degrees(glm::eulerAngles(glm::normalize(quaternion)));
 }
 
+glm::vec3 SceneComponent::GetDirection() const
+{
+    glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    glm::mat4 fRot = rotZ * rotX * rotY;
+    glm::vec3 dir = glm::vec3(fRot * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+
+    return dir;
+}
+
 void MeshComponent::Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights)
 {
     if(auto m = mesh.lock())
@@ -36,6 +49,7 @@ void MeshComponent::Render(CameraComponent* currentCamera, std::vector<LightComp
             for(auto& light:lights)
             {
                 mat->SetLightPosition(light->GetPosition());
+                mat->SetLightDirectional(light->GetDirection());
                 mat->SetLightIntensity(light->GetIntensity());
                 mat->SetLightColor(light->GetColor());
             }

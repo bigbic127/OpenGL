@@ -36,6 +36,7 @@ class SceneComponent:public IComponent
         glm::vec3 GetRotation() const{return transform.rotation;}
         glm::vec3 GetScale() const{return transform.scale;}
         glm::mat4 GetMatrix() const;
+        glm::vec3 GetDirection() const;
     protected:
         Transform transform;
         void ToQuaternion();

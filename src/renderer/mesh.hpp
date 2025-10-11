@@ -163,12 +163,9 @@ class ShpereMesh:public Mesh
                 {
                     int current = lat * (slices + 1) + lon;
                     int next = current + slices + 1;
-
-                    // 삼각형 두 개로 사각형을 구성
                     indices.push_back(current);
                     indices.push_back(current + 1);
                     indices.push_back(next);
-
                     indices.push_back(current + 1);
                     indices.push_back(next + 1);
                     indices.push_back(next);
@@ -180,7 +177,56 @@ class ShpereMesh:public Mesh
 
 class ConeMesh:public Mesh
 {
+    public:
+        ConeMesh(int slices, float radius, float height):Mesh(CreateVertices(slices, radius, height),
+                                                              CreateIndices(slices)){}
+    private:
+        static std::vector<Vertex> CreateVertices(int slices, float radius, float height)
+        {
+            std::vector<Vertex> vertices;
+            constexpr float PI = 3.14159265359f;
+            float halfHeight = height * 0.5f;
+            glm::vec3 apex(0.0f, halfHeight, 0.0f);
+            glm::vec3 baseCenter(0.0f, -halfHeight, 0.0f);
+            for (int i = 0; i <= slices; ++i)
+            {
+                float theta = (2.0f * PI * i) / slices;
+                float x = radius * cos(theta);
+                float z = radius * sin(theta);
+                glm::vec3 pos(x, -halfHeight, z);
+                glm::vec3 normal = glm::normalize(glm::vec3(x, radius / height, z));
+                glm::vec2 uv(static_cast<float>(i) / slices, 1.0f);
 
+                vertices.push_back({pos, normal, uv});
+            }
+            vertices.push_back({apex, glm::vec3(0, 1, 0), glm::vec2(0.5f, 0)});
+            vertices.push_back({baseCenter, glm::vec3(0, -1, 0), glm::vec2(0.5f, 0.5f)});
+
+            return vertices;        
+        }
+        static std::vector<unsigned int> CreateIndices(int slices)
+        {
+            std::vector<unsigned int> indices;
+
+            int apexIndex = slices + 1;
+            int baseCenterIndex = apexIndex + 1;
+            for (int i = 0; i < slices; ++i)
+            {
+                int next = (i + 1) % slices;
+                indices.push_back(apexIndex);
+                indices.push_back(i);
+                indices.push_back(next);
+            }
+            for (int i = 0; i < slices; ++i)
+            {
+                int next = (i + 1) % slices;
+                indices.push_back(baseCenterIndex);
+                indices.push_back(next);
+                indices.push_back(i);
+            }
+
+            return indices;
+        }
 };
 
 class CylinderMesh:public Mesh
