@@ -19,6 +19,7 @@ class World
     private:
         std::vector<std::unique_ptr<Actor>> actors;
         float deltaTime;
+        float lastFrame;
         CameraComponent* camera =  nullptr;
         std::vector<LightComponent*> lights;
 };

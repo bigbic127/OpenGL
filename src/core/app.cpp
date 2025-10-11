@@ -93,17 +93,17 @@ int main()
         renderer->Init();
         while(!window.ShouldClose())
         {
+            float deltaTime = world.GetDeltaTime();
             cameraActor->GetComponent<CameraComponent>()->SetAspect(window.GetAspect());
             glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
-            rot.y += 0.1f;
+            rot.y += 10.0f * deltaTime;
             actor->GetComponent<MeshComponent>()->SetRotation(rot);
             rot = actor2->GetComponent<MeshComponent>()->GetRotation();
-            rot.y -= 0.1f;
+            rot.y -= 10.0f * deltaTime;
             actor2->GetComponent<MeshComponent>()->SetRotation(rot);
             rot = actor3->GetComponent<MeshComponent>()->GetRotation();
-            rot.y += 0.5f;
+            rot.y += 50.0f * deltaTime;
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
-
 
             world.Update();
             renderer->Clear();

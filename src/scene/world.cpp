@@ -1,4 +1,6 @@
 #include "world.hpp"
+#include "GLFW/glfw3.h"
+#include "core/logger.hpp"
 
 Actor* World::CreateActor()
 {
@@ -22,6 +24,9 @@ void World::DeleteActor(Actor* actor)
 
 void World::Update()
 {
+    float currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
     for(const auto& actor:GetActors())
     {
         actor->Update(GetDeltaTime());
