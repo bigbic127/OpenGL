@@ -45,6 +45,7 @@ void MeshComponent::Render(CameraComponent* currentCamera, std::vector<LightComp
             //camera
             mat->SetViewMatrix(currentCamera->GetViewMatrix());
             mat->SetProjectMatrix(currentCamera->GetProjectionMatrix());
+            mat->SetCameraPosition(currentCamera->GetPosition());
             //light
             for(auto& light:lights)
             {

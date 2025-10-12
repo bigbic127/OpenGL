@@ -37,6 +37,7 @@ class Material:public IMaterial
         void SetLightDirectional(glm::vec3 v){vLightDirectional = v;}
         void SetLightColor(glm::vec3 v){vLightColor = v;}
         void SetLightIntensity(float v){fLightIntensity =v;}
+        void SetCameraPosition(glm::vec3 v){vCameraPosition = v;}
         void AddTexture(std::shared_ptr<Texture> texture, std::string name);
         void Apply() override;
         void Bind() override;
@@ -56,5 +57,6 @@ class Material:public IMaterial
         glm::vec3 vLightPosition = glm::vec3(0.0f);
         glm::vec3 vLightDirectional = glm::vec3(1.0f, 1.0f, -1.0f);
         glm::vec3 vLightColor = glm::vec3(1.0f);
+        glm::vec3 vCameraPosition = glm::vec3(0.0f);
         float fLightIntensity = 1.0f;
 };

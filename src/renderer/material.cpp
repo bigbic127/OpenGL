@@ -32,6 +32,8 @@ void Material::Bind()
         s->SetVector3("directionalLight", vLightDirectional);
         s->SetFloat("lightIntensity", fLightIntensity);
         s->SetVector3("lightColor", vLightColor);
+        //Camera
+        s->SetVector3("cameraPosition", vCameraPosition);
         //Parameter
         Apply();
     }
