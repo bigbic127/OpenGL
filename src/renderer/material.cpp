@@ -7,8 +7,9 @@ void Material::Apply()
     {
         s->SetVector3("ambientColor", parameter.ambientColor);
         s->SetVector3("baseColor", parameter.baseColor);
+        s->SetVector3("specularColor", parameter.specularColor);
+        s->SetFloat("specularShininess", parameter.specularShininess);
         s->SetBool("bDiffuse", int(parameter.bDiffuse));
-        s->SetVector3("specColor", parameter.specColor);
         s->SetBool("bSpecular", int(parameter.bSpecular));
         s->SetBool("bNormal", int(parameter.bSpecular));
         if(parameter.bDiffuse)
@@ -54,6 +55,14 @@ void Material::AddTexture(std::shared_ptr<Texture> texture, std::string name)
     {
         texture->Init(s, name);
         if (name == "diffuseTexture")
+        {
             parameter.diffuseTexture = texture;
+            parameter.bDiffuse = true;
+        }
+        else if(name == "specularTexture")
+        {
+            parameter.specularTexture = texture;
+            parameter.bSpecular = true;
+        }
     }
 }

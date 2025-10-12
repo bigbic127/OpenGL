@@ -8,9 +8,10 @@ struct MaterialParameter
 {
     glm::vec3 ambientColor = {0.0f, 0.0f, 0.0f};
     glm::vec3 baseColor = {1.0f, 1.0f, 1.0f};
+    glm::vec3 specularColor = {0.5f, 0.5f, 0.5f};
+    float specularShininess = 32.0f;
     bool bDiffuse = false;
     std::weak_ptr<Texture> diffuseTexture;
-    glm::vec3 specColor = {1.0f, 1.0f, 1.0f};
     bool bSpecular = false;
     std::weak_ptr<Texture> specularTexture;
     bool bNormal = false;
@@ -46,7 +47,6 @@ class Material:public IMaterial
         void SetParameter(MaterialParameter p){parameter = p;}
         void SetAmbientColor(glm::vec3 color){parameter.ambientColor = color;}
         void SetBaseColor(glm::vec3 color){parameter.baseColor = color;}
-        void SetDiffuseTexture(bool diff){parameter.bDiffuse = diff;}
     private:
         std::weak_ptr<Shader> shader;
         MaterialParameter parameter;

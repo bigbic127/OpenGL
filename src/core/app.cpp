@@ -22,14 +22,17 @@ int main()
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
         std::string diffuseTexturePath = "/assets/container2.png";
+        std::string specularTexturePath = "/assets/container2_specular.png";
         std::string moonTexturePath = "/assets/mercury.jpg";
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexShaderPath, fragShaderPath);
         //standard material
         std::shared_ptr<Material> standardMaterial = std::make_shared<Material>(shader);
         //cube material
         std::shared_ptr<Material> material = std::make_shared<Material>(shader);
-        std::shared_ptr<Texture> texture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath), 0);
-        material->AddTexture(texture, "diffuseTexture");
+        std::shared_ptr<Texture> diffuseTexture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath), 0);
+        std::shared_ptr<Texture> specularTexture = std::make_shared<Texture>(GetFullPath(specularTexturePath), 1);
+        material->AddTexture(diffuseTexture, "diffuseTexture");
+        material->AddTexture(specularTexture, "specularTexture");
         //moon material
         std::shared_ptr<Material> moonMaterial = std::make_shared<Material>(shader);
         std::shared_ptr<Texture> moonTexture = std::make_shared<Texture>(GetFullPath(moonTexturePath), 0);
@@ -39,9 +42,7 @@ int main()
         //material parameter
         standardMaterial->SetBaseColor(glm::vec3(0.2f, 0.1f, 0.1f));
         standardMaterial->SetAmbientColor(glm::vec3(1.0f));
-        material->SetDiffuseTexture(true);
         material->SetAmbientColor(glm::vec3(0.5f));
-        moonMaterial->SetDiffuseTexture(true);
         moonMaterial->SetBaseColor(glm::vec3(0.3f));
         lightMaterial->SetBaseColor(glm::vec3(1.0f));
         lightMaterial->SetAmbientColor(glm::vec3( 1.0f));
@@ -54,13 +55,15 @@ int main()
         //light
         auto lightActor = world.CreateActor();
         lightActor->name = "Light";
+        glm::vec3 pos = {0.0f, 3.0f, 1.0f};
         glm::vec3 rot = {0.0f, 0.0f, 45.0f};
         lightActor->AddComponent<MeshComponent>(coneMesh);
         lightActor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.05f, -0.5f, 0.05f));
-        lightActor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 3.0f, 1.0f));
+        lightActor->GetComponent<MeshComponent>()->SetPosition(pos);
         lightActor->GetComponent<MeshComponent>()->SetRotation(rot);
         lightActor->GetComponent<MeshComponent>()->SetMaterial(lightMaterial);
         lightActor->AddComponent<LightComponent>();
+        lightActor->GetComponent<LightComponent>()->SetPosition(pos);
         lightActor->GetComponent<LightComponent>()->SetRotation(rot);
         LightComponent* lightComponent = lightActor->GetComponent<LightComponent>();
         //mesh
