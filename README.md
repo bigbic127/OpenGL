@@ -15,4 +15,4 @@
 
 ## 🖼️ 샘플 렌더 결과
 
-![alt text](screenshot/image-gif.gif)
+![alt text](screenshot/image.gif)

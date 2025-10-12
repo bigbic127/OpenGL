@@ -231,5 +231,112 @@ class ConeMesh:public Mesh
 
 class CylinderMesh:public Mesh
 {
+    public:
+        CylinderMesh(int slices, float radius, float height):Mesh(CreateVertices(slices, radius, height),
+                                                                  CreateIndices(slices)){}
+    private:
+        static std::vector<Vertex> CreateVertices(int slices, float radius, float height)
+        {
+            std::vector<Vertex> vertices;
+            constexpr float PI = 3.14159265359f;
+            float halfHeight = height * 0.5f;
+            for (int i = 0; i <= slices; ++i)
+            {
+                float theta = (2.0f * PI * i) / slices;
+                float x = radius * cos(theta);
+                float z = radius * sin(theta);
+                glm::vec3 normal = glm::normalize(glm::vec3(x, 0.0f, z));
+                float u = static_cast<float>(i) / slices;
+                vertices.push_back({ glm::vec3(x,  halfHeight, z), normal, glm::vec2(u, 0.0f) });
+                vertices.push_back({ glm::vec3(x, -halfHeight, z), normal, glm::vec2(u, 1.0f) });
+            }
+            glm::vec3 topNormal = glm::vec3(0, 1, 0);
+            for (int i = 0; i <= slices; ++i)
+            {
+                float theta = (2.0f * PI * i) / slices;
+                float x = radius * cos(theta);
+                float z = radius * sin(theta);
+                float u = (cos(theta) + 1.0f) * 0.5f;
+                float v = (sin(theta) + 1.0f) * 0.5f;
 
+                vertices.push_back({ glm::vec3(x, halfHeight, z), topNormal, glm::vec2(u, v) });
+            }
+            vertices.push_back({ glm::vec3(0, halfHeight, 0), topNormal, glm::vec2(0.5f, 0.5f) });
+            glm::vec3 bottomNormal = glm::vec3(0, -1, 0);
+            for (int i = 0; i <= slices; ++i)
+            {
+                float theta = (2.0f * PI * i) / slices;
+                float x = radius * cos(theta);
+                float z = radius * sin(theta);
+                float u = (cos(theta) + 1.0f) * 0.5f;
+                float v = (sin(theta) + 1.0f) * 0.5f;
+
+                vertices.push_back({ glm::vec3(x, -halfHeight, z), bottomNormal, glm::vec2(u, v) });
+            }
+            vertices.push_back({ glm::vec3(0, -halfHeight, 0), bottomNormal, glm::vec2(0.5f, 0.5f) });
+            int bottomCenterIndex = static_cast<int>(vertices.size()) - 1;
+            return vertices;
+        }
+
+        static std::vector<unsigned int> CreateIndices(int slices)
+        {
+            std::vector<unsigned int> indices;
+            for (int i = 0; i < slices; ++i)
+            {
+                int top1 = i * 2;
+                int bottom1 = top1 + 1;
+                int top2 = ((i + 1) * 2);
+                int bottom2 = top2 + 1;
+                indices.push_back(top1);
+                indices.push_back(top2);
+                indices.push_back(bottom1);
+                indices.push_back(top2);
+                indices.push_back(bottom2);
+                indices.push_back(bottom1);
+            }
+            int topStartIndex = (slices + 1) * 2;
+            int topCenterIndex = topStartIndex + slices + 1;
+            for (int i = 0; i < slices; ++i)
+            {
+                int curr = topStartIndex + i;
+                int next = topStartIndex + (i + 1);
+                indices.push_back(topCenterIndex);
+                indices.push_back(next);
+                indices.push_back(curr);
+            }
+            int bottomStartIndex = topCenterIndex + 1;
+            int bottomCenterIndex = bottomStartIndex + slices + 1;
+
+            for (int i = 0; i < slices; ++i)
+            {
+                int curr = bottomStartIndex + i;
+                int next = bottomStartIndex + (i + 1);
+                indices.push_back(bottomCenterIndex);
+                indices.push_back(curr);
+                indices.push_back(next);
+            }
+            return indices;
+        }
+};
+
+class PlaneMesh:public Mesh
+{
+    public:
+        PlaneMesh(float size = 1.0f):Mesh(CreatePlaneVertices(size),
+                                          CreatePlaneIndices()){}
+    private:
+        static std::vector<Vertex> CreatePlaneVertices(float size)
+        {
+            float s = size * 0.5f;
+            return {
+                {{-s, 0, -s}, {0, 1, 0}, {0, 0}},
+                {{ s, 0, -s}, {0, 1, 0}, {1, 0}},
+                {{ s, 0,  s}, {0, 1, 0}, {1, 1}},
+                {{-s, 0,  s}, {0, 1, 0}, {0, 1}},
+            };
+        }
+        static std::vector<unsigned int> CreatePlaneIndices()
+        {
+            return { 0, 2, 1, 0, 3, 2 };
+        }
 };

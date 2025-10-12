@@ -10,7 +10,6 @@ class World
         void DeleteActor(Actor* actor);
         const std::vector<std::unique_ptr<Actor>>& GetActors(){return actors;}
         const float GetDeltaTime()const{return deltaTime;}
-        void SetDeltaTime(float time){deltaTime = time;}
         CameraComponent* GetCurrentCamera()const{return camera;}
         std::vector<LightComponent*> GetLights()const{return lights;}
         void SetCurrentCamera(CameraComponent* c){camera = c;}
