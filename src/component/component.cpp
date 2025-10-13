@@ -9,6 +9,7 @@ glm::mat4 SceneComponent::GetMatrix() const
     model = glm::scale(model, transform.scale);
     return model;
 }
+
 void SceneComponent::ToQuaternion()
 {
     quaternion = glm::normalize(glm::quat(glm::radians(transform.rotation)));

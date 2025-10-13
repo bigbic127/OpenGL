@@ -1,4 +1,5 @@
 #version 410 core
+#define MAX_LIGHTS 8
 #define LIGHT_TYPE_DIRECTIONAL 0
 #define LIGHT_TYPE_SPOT 1
 #define LIGHT_TYPE_POINT 2
@@ -8,6 +9,27 @@ in vec3 fragWorldPos;
 in vec3 fragNormal;
 in vec2 fragTexCoord;
 //light
+struct DirectionalLight
+{
+    vec3 direction;
+    vec3 color;
+    float intensity;
+};
+struct Light
+{
+    vec3 position;
+    vec3 direction;
+    vec3 color;
+    float intensity;
+    float constant;
+    float linear;
+    float quadratic;
+    float cutOff;
+    float outerCutOff;
+    int type;
+};
+//uniform DirectionalLight directionalLight;
+uniform int maxLights = 0;
 uniform int lightType = 0;
 uniform vec3 lightPosition;
 uniform float lightIntensity = 1.0f;

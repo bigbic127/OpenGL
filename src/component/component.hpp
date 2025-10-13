@@ -65,6 +65,9 @@ class CameraComponent:public SceneComponent
     public:
         glm::mat4 GetViewMatrix()const{return view;}
         glm::mat4 GetProjectionMatrix()const{return projection;}
+        glm::vec3 GetFront()const{return front;}
+        glm::vec3 GetUp()const{return up;}
+        void SetFront(glm::vec3 f){front = f;}
         void SetAspect(float a){aspect = a;}
         void Update(float deltaTime) override;
     private:
@@ -89,9 +92,4 @@ class LightComponent:public SceneComponent
     private:
         float lightIntensity = 1.0f;
         glm::vec3 color{1.0f, 1.0f, 1.0f};
-};
-
-class DirectionalLightComponent:public LightComponent
-{
-
 };

@@ -5,11 +5,12 @@
 #include "scene/actor.hpp"
 #include "logger.hpp"
 #include "system/folder.hpp"
-
+#include "core/input.hpp"
 int main()
 {
     Window window;
     World world;
+    Input input;
     std::unique_ptr<IRenderer> renderer;
     renderer = std::make_unique<OpenGLRenderer>();
     if(window.Init())
@@ -61,6 +62,8 @@ int main()
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* cameraComponent = cameraActor->GetComponent<CameraComponent>();
         cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
+        //cameraActor->GetComponent<CameraComponent>()->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+
         //light
         auto lightActor = world.CreateActor();
         lightActor->name = "Light";
@@ -109,7 +112,12 @@ int main()
         lightComponent->SetIntensity(5.0f);
         lightComponent->SetColor(glm::vec3(1.0f,1.0f,1.0f));
 
+        //Initialization
+        input.Init(window.GetWindow());
+        input.SetCameraComponent(world.GetCurrentCamera());
         renderer->Init();
+
+        //MainLoop
         while(!window.ShouldClose())
         {
             float deltaTime = world.GetDeltaTime();
@@ -123,8 +131,13 @@ int main()
             rot = actor3->GetComponent<MeshComponent>()->GetRotation();
             rot.y += 50.0f * deltaTime;
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
-
+            
+            //inputLoop
+            input.Process(window.GetWindow(), deltaTime);
+            
+            //UpdataLoop
             world.Update();
+            //RenderLoop
             renderer->Clear();
             renderer->Begin();
             renderer->Render(world);

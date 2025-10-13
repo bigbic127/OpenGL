@@ -15,6 +15,7 @@ class Window
         static void WindowResizeCallback(GLFWwindow* window, int w, int h);
         static void FrameBufferSizeCallback(GLFWwindow* window, int w, int h);
         float GetAspect();
+        GLFWwindow* GetWindow()const{return window;}
     private:
         int width, height;
         GLFWwindow* window = nullptr;
