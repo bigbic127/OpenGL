@@ -42,10 +42,14 @@ void Material::Bind()
 
 void Material::Unbind()
 {
-    if(parameter.bDiffuse)
+    if(auto s = shader.lock())
     {
-        if(auto p = parameter.diffuseTexture.lock())
-            p->Bind();
+        s->Unbind();
+        if(parameter.bDiffuse)
+        {
+            if(auto p = parameter.diffuseTexture.lock())
+                p->Unbind();
+        }
     }
 }
 

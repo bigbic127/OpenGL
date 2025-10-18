@@ -14,10 +14,10 @@ int main()
     //create instance;
     Window window;
     std::shared_ptr<World> world = std::make_shared<World>();
-    ResourceManager resourceManager(world);
     std::unique_ptr<IRenderer> renderer = std::make_unique<OpenGLRenderer>();//OpenGL, Vulkan Select
     if(window.Init())
     {
+        ResourceManager resourceManager(world);
         Input input;
         input.SetResourceManager(&resourceManager);
         Editor editor(window.GetWindow());
@@ -91,7 +91,7 @@ int main()
         auto actor = world->CreateActor();
         actor->name = "CubeMesh01";
         actor->AddComponent<MeshComponent>(cubeMesh);
-        actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
+        //actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
         //actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f, -25.0f, 0.0f));
         //mesh02
         auto actor2 = world->CreateActor();
@@ -129,6 +129,7 @@ int main()
         //MainLoop
         while(!window.ShouldClose())
         {
+            /*
             float deltaTime = world->GetDeltaTime();
             cameraActor->GetComponent<CameraComponent>()->SetAspect(window.GetAspect());
             glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
@@ -140,8 +141,9 @@ int main()
             rot = actor3->GetComponent<MeshComponent>()->GetRotation();
             rot.y += 50.0f * deltaTime;
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
-            
+            */
             //inputLoop
+            float deltaTime = world->GetDeltaTime();
             input.Process(window.GetWindow(), deltaTime);
             
             //UpdataLoop

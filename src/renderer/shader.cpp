@@ -40,6 +40,11 @@ void Shader::UseProgram()
     glUseProgram(programID);
 }
 
+void Shader::Unbind()
+{
+    glUseProgram(0);
+}
+
 std::string Shader::LoadShaderSource(const std::string& path)
 {
     std::string p = path;

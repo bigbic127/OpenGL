@@ -23,7 +23,7 @@ Texture::Texture(std::string path)
         stbi_image_free(data);
     }
 }
-
+//byte 압축(png,jpg)
 Texture::Texture(const unsigned char* data, unsigned int size)
 {
     glGenTextures(1, &textureID);
@@ -32,6 +32,7 @@ Texture::Texture(const unsigned char* data, unsigned int size)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    stbi_set_flip_vertically_on_load(true);
     unsigned char* _data = stbi_load_from_memory(data, size, &width, &height, &nrChannels, 0);
     if(!_data)
         Logger::ErrorMessage("Failed to Image Load.");
@@ -43,13 +44,26 @@ Texture::Texture(const unsigned char* data, unsigned int size)
         stbi_image_free(_data);
     }
 }
-
+//byte 비압축(RAW)
+Texture::Texture(const unsigned char* data, unsigned int width, unsigned int height)
+{
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    stbi_set_flip_vertically_on_load(true);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
 
 Texture::~Texture()
 {
     glDeleteTextures(1, &textureID);
 }
 
+//텍스쳐 활성화
 void Texture::Init(std::shared_ptr<Shader> shader, std::string& name, unsigned int index)
 {
     locationID = shader->GetLocation(name);

@@ -20,6 +20,7 @@ class IMesh
 {
     public:
         virtual ~IMesh() = default;
+        virtual std::vector<Vertex> GetVertices() const = 0;
         virtual void Bind() = 0;
         virtual void Draw() = 0;
         virtual void Unbind() = 0;
@@ -30,7 +31,7 @@ class Mesh:public IMesh
     public:
         Mesh(std::vector<Vertex>& v, std::vector<unsigned int>& i);
         ~Mesh();
-        
+        std::vector<Vertex> GetVertices() const override {return vertices;}
         void Bind() override;
         void Unbind() override;
         void Draw() override;
@@ -40,6 +41,7 @@ class Mesh:public IMesh
         std::vector<unsigned int> indices;
 };
 
+// 기본 도형
 class CubeMesh:public Mesh
 {
     public:

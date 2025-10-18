@@ -7,8 +7,9 @@
 class Texture
 {
     public:
-        Texture(std::string path);
-        Texture(const unsigned char* data, unsigned int size);
+        Texture(std::string path);//이미지 저장 경로
+        Texture(const unsigned char* data, unsigned int size);//byte 압축(png,jpg)
+        Texture(const unsigned char* data, unsigned int width, unsigned int height);//byte 비압축(row)
         ~Texture();
         void Init(std::shared_ptr<Shader> shader, std::string& name, unsigned int index);
         void Bind();
