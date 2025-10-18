@@ -21,7 +21,7 @@ void ResourceManager::LoadModel()
     for(auto& path:paths)
     {
         
-        const aiScene* scene = importer.ReadFile(path.string(), aiProcess_Triangulate|aiProcess_FlipUVs|aiProcess_GenNormals);
+        const aiScene* scene = importer.ReadFile(path.string(), aiProcess_Triangulate|aiProcess_GenNormals);
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             Logger::ErrorMessage("Failed to file load.");
@@ -109,6 +109,7 @@ void ResourceManager::ProcessTexture(const aiScene* scene)
         {
             if(texture->mHeight == 0)
             {
+                std::cerr << texture->mFilename.C_Str() << std::endl;
                 const unsigned char* data = reinterpret_cast<const unsigned char*>(texture->pcData);
                 std::shared_ptr<Texture> tex = std::make_shared<Texture>(data, texture->mWidth);
                 textures.push_back(tex);
@@ -209,9 +210,9 @@ void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
             actor->name = mesh->mName.C_Str();
             actor->AddComponent<MeshComponent>(meshes[index]);
             actor->GetComponent<MeshComponent>()->SetMaterial(materials[matIndex]);
-            actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-2.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(-90.0f,180.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.05f));
+            actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-1.0f,0.0f));
+            actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f,180.0f,0.0f));
+            actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.002f));
             materials[matIndex]->SetAmbientColor(glm::vec3(0.5f));
         }
     }
