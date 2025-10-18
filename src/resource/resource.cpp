@@ -55,6 +55,7 @@ void ResourceManager::ProcessMesh(const aiScene* scene)
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         aiMesh* mesh = scene->mMeshes[i];
+        std::cerr << mesh->mName.C_Str() << std::endl;
         for(size_t j=0;j<mesh->mNumVertices;j++)
         {
             Vertex vertex;
@@ -124,6 +125,7 @@ void ResourceManager::ProcessMaterial(const aiScene* scene)
     {
         MaterialParameter parameter;
         aiMaterial* material = scene->mMaterials[i];
+        std::cerr << material->GetName().C_Str() << std::endl;
         aiColor3D color(0.f,0.f,0.f);
         float value =0.f;
         aiString texPath;
@@ -210,9 +212,9 @@ void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
             actor->name = mesh->mName.C_Str();
             actor->AddComponent<MeshComponent>(meshes[index]);
             actor->GetComponent<MeshComponent>()->SetMaterial(materials[matIndex]);
-            actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-1.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f,180.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.002f));
+            actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-2.0f,0.0f));
+            actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f,90.0f,0.0f));
+            actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(3.0f));
             materials[matIndex]->SetAmbientColor(glm::vec3(0.5f));
         }
     }
