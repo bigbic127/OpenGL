@@ -1,13 +1,7 @@
 #include "input.hpp"
 #include "component/component.hpp"
 #include "core/logger.hpp"
-
-void Input::Init(GLFWwindow* window)
-{
-    glfwSetWindowUserPointer(window, this);
-    glfwSetMouseButtonCallback(window, MouseButton_CallbackStatic);
-    glfwSetCursorPosCallback(window, CursorPos_CallbackStatic);
-}
+#include "resource/resource.hpp"
 
 void Input::Process(GLFWwindow* window, float deltaTime)
 {
@@ -17,6 +11,10 @@ void Input::Process(GLFWwindow* window, float deltaTime)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
+    }
+    else if(glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+    {
+        //ResourceManager::LoadModel();
     }
     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -35,7 +33,7 @@ void Input::Process(GLFWwindow* window, float deltaTime)
         camera->SetPosition(position);
 }
 
-void Input::MouseButton_Callback(GLFWwindow* window, int button, int action, int mods)
+void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if(glfwGetMouseButton(window, button) == GLFW_PRESS)
     {
@@ -59,12 +57,12 @@ void Input::MouseButton_Callback(GLFWwindow* window, int button, int action, int
     std::cerr<<bMouseLeftClicked<<std::endl;
 }
 
-void Input::Scroll_Callback(GLFWwindow*window, double xoffset, double yoffset)
+void Input::ScrollCallback(GLFWwindow*window, double xoffset, double yoffset)
 {
 
 }
 
-void Input::CursorPos_Callback(GLFWwindow* window, double xpos, double ypos)
+void Input::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     if(bMouseLeftClicked)
     {
@@ -100,18 +98,3 @@ void Input::CursorPos_Callback(GLFWwindow* window, double xpos, double ypos)
         camera->SetRotation(glm::vec3(pitch, yaw, 0.0f));
     }
 }
-
-void Input::MouseButton_CallbackStatic(GLFWwindow* window, int button, int action, int mods)
-{
-    Input* instance = static_cast<Input*>(glfwGetWindowUserPointer(window));
-    if(instance)
-        instance->MouseButton_Callback(window, button, action, mods);
-}
-
-void Input::CursorPos_CallbackStatic(GLFWwindow* window, double xpos, double ypos)
-{
-    Input* instance = static_cast<Input*>(glfwGetWindowUserPointer(window));
-    if(instance)
-        instance->CursorPos_Callback(window, xpos, ypos);
-}
-

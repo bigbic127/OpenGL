@@ -33,6 +33,7 @@ bool Window::Init()
     glfwSetErrorCallback(Logger::WindowErrorCallback);
     glfwSetWindowSizeCallback(window, Window::WindowResizeCallback);
     glfwSetFramebufferSizeCallback(window, Window::FrameBufferSizeCallback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
     if(!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
     {
         Logger::ErrorMessage("Failed to Glad Load.");
@@ -65,8 +66,24 @@ void Window::WindowResizeCallback(GLFWwindow* window, int w, int h)
 
 void Window::FrameBufferSizeCallback(GLFWwindow* window, int w, int h)
 {
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
     glViewport(0, 0, w, h);
 }
+
+void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if(win->input !=nullptr)
+        win->input->MouseButtonCallback(window, button, action, mods);
+}
+
+void Window::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+
+}
+
+
+
 
 float Window::GetAspect()
 {

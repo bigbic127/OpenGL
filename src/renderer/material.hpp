@@ -9,6 +9,10 @@ struct MaterialParameter
     glm::vec3 ambientColor = {0.0f, 0.0f, 0.0f};
     glm::vec3 baseColor = {1.0f, 1.0f, 1.0f};
     glm::vec3 specularColor = {0.5f, 0.5f, 0.5f};
+    float metallicFactor = 0.0f;
+    float roughnessRactor = 0.5f;
+    float opacity = 1.0f;
+    float shininess = 0.5f;
     float specularShininess = 32.0f;
     bool bDiffuse = false;
     std::weak_ptr<Texture> diffuseTexture;
@@ -50,7 +54,6 @@ class Material:public IMaterial
     private:
         std::weak_ptr<Shader> shader;
         MaterialParameter parameter;
-        std::vector<std::weak_ptr<Texture>> textures;
         glm::mat4 mModel = glm::mat4(1.0f);
         glm::mat4 mView = glm::mat4(1.0f);
         glm::mat4 mProjection = glm::mat4(1.0f);
