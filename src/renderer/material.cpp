@@ -53,14 +53,15 @@ void Material::AddTexture(std::shared_ptr<Texture> texture, std::string name)
 {
     if(auto s = shader.lock())
     {
-        texture->Init(s, name);
         if (name == "diffuseTexture")
         {
+            texture->Init(s, name, 0);
             parameter.diffuseTexture = texture;
             parameter.bDiffuse = true;
         }
         else if(name == "specularTexture")
         {
+            texture->Init(s, name, 1);
             parameter.specularTexture = texture;
             parameter.bSpecular = true;
         }

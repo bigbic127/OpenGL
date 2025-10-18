@@ -7,12 +7,13 @@
 class Texture
 {
     public:
-        Texture(std::string path, unsigned int u);
+        Texture(std::string path);
+        Texture(const unsigned char* data, unsigned int size);
         ~Texture();
-        void Init(std::shared_ptr<Shader> shader, std::string& name);
+        void Init(std::shared_ptr<Shader> shader, std::string& name, unsigned int index);
         void Bind();
         void Unbind();
     private:
-        unsigned int textureID, locationID, unitIndex;
+        unsigned int textureID, locationID;
         int width, height, nrChannels;
 };

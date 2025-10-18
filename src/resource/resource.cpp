@@ -28,7 +28,8 @@ void ResourceManager::LoadModel()
         std::cerr << "light count:" << scene->mNumLights<< std::endl;
         ProcessMesh(scene);
         ProcessMaterial(scene);
-        ProcessNode(scene->mRootNode, scene);
+        ProcessTexture(scene);
+        //ProcessNode(scene->mRootNode, scene);
     }
 }
 
@@ -55,9 +56,15 @@ void ResourceManager::ProcessMesh(const aiScene* scene)
             {
                 vertex.texcoord.x = mesh->mTextureCoords[0][i].x;
                 vertex.texcoord.y = mesh->mTextureCoords[0][i].y;
+            }
+            if(mesh->mTangents)
+            {
                 vertex.tangent.x =  mesh->mTangents[i].x;
                 vertex.tangent.y = mesh->mTangents[i].y;
                 vertex.tangent.z = mesh->mTangents[i].z;
+            }
+            if(mesh->mBitangents)
+            {
                 vertex.bitTangent.x = mesh->mBitangents[i].x;
                 vertex.bitTangent.y = mesh->mBitangents[i].y;
                 vertex.bitTangent.z = mesh->mBitangents[i].z;
@@ -77,7 +84,7 @@ void ResourceManager::ProcessMesh(const aiScene* scene)
     }
 }
 
-void ResourceManager::ProcessMaterial(const aiScene*scene)
+void ResourceManager::ProcessMaterial(const aiScene* scene)
 {
     for(size_t i=0;i<scene->mNumMaterials;i++)
     {
@@ -127,6 +134,37 @@ void ResourceManager::ProcessMaterial(const aiScene*scene)
             {
                 int index = std::atoi(path.c_str()+1);
                 const aiTexture* texture = scene->mTextures[index];
+                if(texture)
+                {
+                    if(texture->mHeight == 0)
+                    {
+                        std::cerr << "texture (png,jpg)) size: " << texture->mWidth << ", format: " << texture->achFormatHint << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << "texture size: " << texture->mWidth << ", x: " << texture->mHeight << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                std::cerr << "texture path: " << path << std::endl;
+            }
+        }
+    }
+}
+
+void ResourceManager::ProcessTexture(const aiScene* scene)
+{
+    for(size_t i=0;i<scene->mNumTextures;i++)
+    {
+        const aiTexture* texture = scene->mTextures[i];
+        if(texture)
+        {
+            if(texture->mHeight == 0)
+            {
+                unsigned char* data = reinterpret_cast<unsigned char*>(texture->pcData);
+                std::shared_ptr<Texture> tex = std::make_shared<Texture>(data, texture->mWidth);
             }
         }
     }

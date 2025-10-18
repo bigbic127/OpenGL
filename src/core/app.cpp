@@ -19,6 +19,7 @@ int main()
     if(window.Init())
     {
         Input input;
+        input.SetResourceManager(&resourceManager);
         Editor editor(window.GetWindow());
         editor.Init();
 
@@ -41,17 +42,17 @@ int main()
         std::shared_ptr<Material> standardMaterial = std::make_shared<Material>(shader);
         //cube material
         std::shared_ptr<Material> boxMaterial = std::make_shared<Material>(shader);
-        std::shared_ptr<Texture> boxDiffTexture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath), 0);
-        std::shared_ptr<Texture> boxSpecTexture = std::make_shared<Texture>(GetFullPath(specularTexturePath), 1);
+        std::shared_ptr<Texture> boxDiffTexture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath));
+        std::shared_ptr<Texture> boxSpecTexture = std::make_shared<Texture>(GetFullPath(specularTexturePath));
         boxMaterial->AddTexture(boxDiffTexture, "diffuseTexture");
         boxMaterial->AddTexture(boxSpecTexture, "specularTexture");
         //moon material
         std::shared_ptr<Material> moonMaterial = std::make_shared<Material>(shader);
-        std::shared_ptr<Texture> moonTexture = std::make_shared<Texture>(GetFullPath(moonTexturePath), 0);
+        std::shared_ptr<Texture> moonTexture = std::make_shared<Texture>(GetFullPath(moonTexturePath));
         moonMaterial->AddTexture(moonTexture, "diffuseTexture");
         //cocacola material
         std::shared_ptr<Material> cocacolaMaterial = std::make_shared<Material>(shader);
-        std::shared_ptr<Texture> cocacolaTexture = std::make_shared<Texture>(GetFullPath(cocacolaTexturePath), 0);
+        std::shared_ptr<Texture> cocacolaTexture = std::make_shared<Texture>(GetFullPath(cocacolaTexturePath));
         cocacolaMaterial->AddTexture(cocacolaTexture, "diffuseTexture");
         //light material
         std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(shader);
