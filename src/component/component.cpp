@@ -63,7 +63,6 @@ void MeshComponent::Render(CameraComponent* currentCamera, std::vector<LightComp
         {
             mat->Unbind();
         }
-
     }
 }
 
@@ -71,4 +70,11 @@ void CameraComponent::Update(float deltaTime)
 {
     view = glm::lookAt(transform.position, target, up);
     projection = glm::perspective(glm::radians(fov), aspect, near, far);
+}
+
+void CameraComponent::SetFront(glm::vec3 f)
+{
+    front = f;
+    right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
+    up = glm::normalize(glm::cross(right, front));
 }

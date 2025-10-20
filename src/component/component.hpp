@@ -66,8 +66,9 @@ class CameraComponent:public SceneComponent
         glm::mat4 GetViewMatrix()const{return view;}
         glm::mat4 GetProjectionMatrix()const{return projection;}
         glm::vec3 GetFront()const{return front;}
+        glm::vec3 GetRight()const{return right;}
         glm::vec3 GetUp()const{return up;}
-        void SetFront(glm::vec3 f){front = f;}
+        void SetFront(glm::vec3 f);
         void SetAspect(float a){aspect = a;}
         void Update(float deltaTime) override;
     private:
@@ -76,6 +77,7 @@ class CameraComponent:public SceneComponent
         float fov{45.0f};
         glm::vec3 target{0.0f, 0.0f, 0.0f};
         glm::vec3 front{0.0f, 0.0f, -1.0f};
+        glm::vec3 right{1.0f, 0.0f, 0.0f};
         glm::vec3 up{0.0f, 1.0f, 0.0f};
         float aspect = 1.778f;
         float near = 0.01f;

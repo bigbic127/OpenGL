@@ -15,8 +15,9 @@ class Editor
         void Init();
         void Update();
         void CreateLayout();
+        void TopMenuBar();
         void CreateStyle();
     private:
-        GLFWwindow* window = nullptr;
+        GLFWwindow* window;
 
 };

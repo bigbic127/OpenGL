@@ -58,8 +58,12 @@ void main()
     vec3 normal = normalize(fragNormal);
     //Texture
     vec3 diffuseTextureColor = vec3(1.0f, 1.0f, 1.0f);
+    float alpha = 1.0f;
     if(bDiffuse)
+    {
         diffuseTextureColor = vec3(texture(diffuseTexture, fragTexCoord).rgb);
+        //alpha = texture(diffuseTexture, fragTexCoord).a;
+    }
     vec3 specularTextureColor = vec3(1.0f, 1.0f, 1.0f);
     if(bSpecular)
         specularTextureColor = vec3(texture(specularTexture, fragTexCoord).rgb);
@@ -95,5 +99,5 @@ void main()
     specularResult *= attenuation * attenuationIntensity;
 
     vec3 finalColor = ambientResult + diffuseResult + specularResult;
-    FragColor = vec4(finalColor, 1.0f);
+    FragColor = vec4(finalColor, alpha);
 }

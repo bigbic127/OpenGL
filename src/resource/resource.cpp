@@ -15,6 +15,8 @@ void ResourceManager::LoadModel()
     paths = FileDialog::ShowFileDialog(false);
 
     Assimp::Importer importer;
+    if (paths.size()<=0)
+        return;
     meshes.clear();
     textures.clear();
     materials.clear();
@@ -199,6 +201,7 @@ void ResourceManager::ProcessMaterial(const aiScene* scene)
 
 void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
 {
+    
     for(size_t i=0;i<node->mNumMeshes;i++)
     {
         //Create Actor
@@ -208,14 +211,22 @@ void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
         ;
         if (auto ptr = world.lock())
         {
+            aiMatrix4x4 aiTransform = node->mTransformation;
+            aiVector3D pos,scale;
+            aiQuaternion rot;
+            aiTransform.Decompose(scale, rot, pos);
+            Transform transform;
+            glm::quat quat = glm::quat(rot.w, rot.x, rot.y, rot.z);
+            transform.position = glm::vec3(pos.x, pos.y, pos.z);
+            transform.rotation = glm::degrees(glm::eulerAngles(glm::normalize(quat)));
+            transform.scale = glm::vec3(scale.x, scale.y, scale.z);
+
             auto actor = ptr->CreateActor();
             actor->name = mesh->mName.C_Str();
             actor->AddComponent<MeshComponent>(meshes[index]);
+            actor->GetComponent<MeshComponent>()->SetTransform(transform);
             actor->GetComponent<MeshComponent>()->SetMaterial(materials[matIndex]);
-            actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-2.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f,90.0f,0.0f));
-            actor->GetComponent<MeshComponent>()->SetScale(glm::vec3(3.0f));
-            materials[matIndex]->SetAmbientColor(glm::vec3(0.5f));
+            materials[matIndex]->SetAmbientColor(glm::vec3(0.25f));
         }
     }
     for(size_t i=0;i<node->mNumChildren;i++)

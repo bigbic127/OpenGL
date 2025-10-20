@@ -14,12 +14,11 @@ int main()
     //create instance;
     Window window;
     std::shared_ptr<World> world = std::make_shared<World>();
-    std::unique_ptr<IRenderer> renderer = std::make_unique<OpenGLRenderer>();//OpenGL, Vulkan Select
+    std::unique_ptr<IRenderer> renderer = std::make_unique<OpenGLRenderer>();//OpenGL, Vulkan select
     if(window.Init())
     {
         ResourceManager resourceManager(world);
-        Input input;
-        input.SetResourceManager(&resourceManager);
+        Input input(&resourceManager);
         Editor editor(window.GetWindow());
         editor.Init();
 
@@ -70,7 +69,7 @@ int main()
         cameraActor->name = "Camera";
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* cameraComponent = cameraActor->GetComponent<CameraComponent>();
-        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, -10.0f));
+        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 10.0f));
         //cameraActor->GetComponent<CameraComponent>()->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
         //light
@@ -91,7 +90,8 @@ int main()
         auto actor = world->CreateActor();
         actor->name = "CubeMesh01";
         actor->AddComponent<MeshComponent>(cubeMesh);
-        //actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
+        actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
+        actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
         //actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f, -25.0f, 0.0f));
         //mesh02
         auto actor2 = world->CreateActor();
@@ -118,7 +118,7 @@ int main()
         world->SetCurrentCamera(cameraComponent);
         world->AddLight(lightComponent);
 
-        lightComponent->SetIntensity(5.0f);
+        lightComponent->SetIntensity(2.5f);
         lightComponent->SetColor(glm::vec3(1.0f,1.0f,1.0f));
 
         //Initialization
@@ -142,10 +142,17 @@ int main()
             rot.y += 50.0f * deltaTime;
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
             */
-            //inputLoop
             float deltaTime = world->GetDeltaTime();
+
+            glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
+            rot = actor3->GetComponent<MeshComponent>()->GetRotation();
+            rot.y += 50.0f * deltaTime;
+            actor3->GetComponent<MeshComponent>()->SetRotation(rot);
+
+            window.PollEvent();
+            cameraActor->GetComponent<CameraComponent>()->SetAspect(window.GetAspect());
             input.Process(window.GetWindow(), deltaTime);
-            
+
             //UpdataLoop
             world->Update();
             //RenderLoop
@@ -153,8 +160,8 @@ int main()
             renderer->Begin();
             renderer->Render(world);
             renderer->End();
+            //editor.Update();
             window.SwapBuffer();
-            window.PollEvent();
         }
     }
     return 0;
