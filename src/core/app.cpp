@@ -160,7 +160,7 @@ int main()
             renderer->Begin();
             renderer->Render(world);
             renderer->End();
-            //editor.Update();
+            editor.Update();
             window.SwapBuffer();
         }
     }

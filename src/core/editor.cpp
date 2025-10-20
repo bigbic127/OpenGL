@@ -16,11 +16,10 @@ void Editor::Init()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        CreateStyle();
+    CreateStyle();
+    ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410");
-    ImGui::StyleColorsDark();
 }
 
 void Editor::Update()
@@ -29,8 +28,17 @@ void Editor::Update()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     CreateLayout();
+    ImGui::ShowDemoWindow();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(window);
+    }
 }
 
 void Editor::CreateLayout()
