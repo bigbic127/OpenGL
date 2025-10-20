@@ -22,7 +22,6 @@ void ResourceManager::LoadModel()
     materials.clear();
     for(auto& path:paths)
     {
-        
         const aiScene* scene = importer.ReadFile(path.string(), aiProcess_Triangulate|aiProcess_GenNormals);
         if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {

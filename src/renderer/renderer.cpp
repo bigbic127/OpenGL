@@ -18,6 +18,7 @@ void OpenGLRenderer::Init()
     glFrontFace(GL_CCW);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    CreateBuffer(800, 600);
 }
 
 void OpenGLRenderer::Clear()
@@ -27,6 +28,7 @@ void OpenGLRenderer::Clear()
 
 void OpenGLRenderer::Begin()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -34,7 +36,6 @@ void OpenGLRenderer::Render(std::weak_ptr<World> world)
 {
     if(auto w = world.lock())
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         for(const auto& actor:w->GetActors())
         {
             actor->Render(w->GetCurrentCamera(), w->GetLights());
@@ -47,9 +48,10 @@ void OpenGLRenderer::End()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OpenGLRenderer::CreateBuffer()
+void OpenGLRenderer::CreateBuffer(int w, int h)
 {
-    int width = 800, height = 600;
+    width = w;
+    height = h;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     //window->GetSize(width, height);
@@ -69,4 +71,16 @@ void OpenGLRenderer::CreateBuffer()
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::ErrorMessage("Framebuffer not complete.");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width, height);
+}
+
+bool OpenGLRenderer::ResizeBuffer(int w, int h)
+{
+    if(w <=0 || h <=0) return false;
+    if(w == width && h == height) return true;
+
+    if(fbo) glDeleteFramebuffers(1, &fbo);
+    if(cbo) glDeleteTextures(1, &cbo);
+    if(rbo) glDeleteRenderbuffers(1, &rbo);
+    CreateBuffer(w, h);
 }

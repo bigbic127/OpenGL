@@ -20,7 +20,11 @@ int main()
         ResourceManager resourceManager(world);
         Input input(&resourceManager);
         Editor editor(window.GetWindow());
+        editor.SetInput(&input);
+        editor.SetResourceManager(&resourceManager);
+        editor.SetRenderer(renderer.get());
         editor.Init();
+
 
         //resourceManager.LoadModel();
         //source_mesh
@@ -150,7 +154,7 @@ int main()
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
 
             window.PollEvent();
-            cameraActor->GetComponent<CameraComponent>()->SetAspect(window.GetAspect());
+            cameraActor->GetComponent<CameraComponent>()->SetAspect(renderer->GetAspect());
             input.Process(window.GetWindow(), deltaTime);
 
             //UpdataLoop

@@ -13,10 +13,9 @@ void Input::Process(GLFWwindow* window, float deltaTime)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    else if(glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+    else if(glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
     {
-        if(resourceManager !=nullptr)
-            resourceManager->LoadModel();
+        resourceManager->LoadModel();
     }
     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
