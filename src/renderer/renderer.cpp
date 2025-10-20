@@ -79,8 +79,8 @@ bool OpenGLRenderer::ResizeBuffer(int w, int h)
     if(w <=0 || h <=0) return false;
     if(w == width && h == height) return true;
 
-    if(fbo) glDeleteFramebuffers(1, &fbo);
-    if(cbo) glDeleteTextures(1, &cbo);
-    if(rbo) glDeleteRenderbuffers(1, &rbo);
+    glDeleteFramebuffers(1, &fbo);
+    glDeleteTextures(1, &cbo);
+    glDeleteRenderbuffers(1, &rbo);
     CreateBuffer(w, h);
 }

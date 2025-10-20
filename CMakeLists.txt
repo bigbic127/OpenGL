@@ -116,6 +116,10 @@ elseif(WIN32)
     ASSIMP_LIB
     opengl32
     )
+    if (MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
+    endif()
+
     set_target_properties(${PROJECT_NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY   "${CMAKE_SOURCE_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin"
@@ -125,9 +129,7 @@ elseif(WIN32)
         OUTPUT_NAME_RELEASE "${PROJECT_NAME}_release"
     )
 endif()
-if (MSVC)
-    add_compile_options(/utf-8)
-endif()
+
 set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/shader")
 set(SHADER_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/shader")
 add_custom_target(copy_shaders ALL
@@ -136,3 +138,6 @@ add_custom_target(copy_shaders ALL
             ${SHADER_OUTPUT_DIR}
     COMMENT "Copying shaders..."
 )
+
+set(ASSET_DIR ${CMAKE_SOURCE_DIR}/bin)
+add_definitions(-DASSET_DIR="${ASSET_DIR}")

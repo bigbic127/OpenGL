@@ -20,12 +20,23 @@ void Editor::Init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    (void)io;
     io.ConfigFlags = ImGuiConfigFlags_NavEnableKeyboard |
                      ImGuiConfigFlags_DockingEnable |
                      ImGuiConfigFlags_ViewportsEnable;
     CreateStyle();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410");
+    //font
+    const std::string fontPath = GetFullPath("/fonts/NanumSquareB.ttf");
+    ImFont* font = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 16.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+    if(font==NULL)
+    {
+        Logger::ErrorMessage("Coluld Not load font file.");
+        io.Fonts->AddFontDefault();
+    }
+    else
+        io.FontDefault = font;
     CreateIcon();
 }
 
@@ -76,17 +87,38 @@ void Editor::CreateLayout()
     //Create MenuBar
     if(ImGui::BeginMainMenuBar())
     {
-        if(ImGui::BeginMenu("File"))
+        ImGui::Separator();
+        ImGui::SameLine();
+        if(ImGui::BeginMenu("파일"))
         {
-            if(ImGui::MenuItem("Open...", "Ctrl + O"))
+            if(ImGui::MenuItem("불러오기", "Ctrl + O"))
             {
                 //Action
                 resourceManager->LoadModel();
             }
             ImGui::Separator();
-            if(ImGui::MenuItem("Exit", "Alt + F4"))
+            if(ImGui::MenuItem("종료", "Alt + F4"))
             {
                 glfwSetWindowShouldClose(window, true);
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::SameLine();
+        ImGui::Separator();
+        ImGui::SameLine();
+        if(ImGui::BeginMenu("추가"))
+        {
+            if(ImGui::MenuItem("박스"))
+            {
+
+            }
+            if(ImGui::MenuItem("구"))
+            {
+
+            }
+            if(ImGui::MenuItem("원통"))
+            {
+
             }
             ImGui::EndMenu();
         }
@@ -103,15 +135,22 @@ void Editor::CreateLayout()
                              ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoSavedSettings |
                              ImGuiWindowFlags_AlwaysAutoResize;
-    if(ImGui::Begin("mainToolvar", nullptr, flags))
+    if(ImGui::Begin("mainToolbar", nullptr, flags))
     {
         ImGui::Separator();
         ImGui::SameLine();
-        if(ImGui::ImageButton("##Open", (void*)(intptr_t)openFolderID, ImVec2(32,32)))
+        if(ImGui::ImageButton("maintoolBarOpenButton", (void*)(intptr_t)openFolderID, ImVec2(32,32)))
         {
             resourceManager->LoadModel();
         }
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text("파일 불러오기 Ctrl + O");
+            ImGui::EndTooltip();
+        }
         toolbarHeight = ImGui::GetWindowHeight();
+        ImGui::Separator();
         ImGui::End();
     }
     ImGui::PopStyleVar();//스타일해제
@@ -136,7 +175,7 @@ void Editor::CreateLayout()
     ImGui::DockSpace(dockSpaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
     ImGui::End();
     //Create Hierarchy
-    if(ImGui::Begin("hierarchy"))
+    if(ImGui::Begin("아웃라이너"))
     {
         if(ImGui::TreeNode("Scene"))
         {
