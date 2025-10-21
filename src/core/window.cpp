@@ -20,7 +20,7 @@ bool Window::Init()
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
-    //glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
     window = glfwCreateWindow(width, height, "OpengGL", nullptr, nullptr);
     if (window == nullptr)
     {
@@ -32,7 +32,7 @@ bool Window::Init()
     glfwSetWindowUserPointer(window, this);
     glfwSetErrorCallback(Logger::WindowErrorCallback);
     glfwSetWindowSizeCallback(window, Window::WindowResizeCallback);
-    glfwSetFramebufferSizeCallback(window, Window::FrameBufferSizeCallback);
+    //glfwSetFramebufferSizeCallback(window, Window::FrameBufferSizeCallback);
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetCursorPosCallback(window, CursorPosCallback);
     glfwSetScrollCallback(window, ScrollCallback);
@@ -70,7 +70,7 @@ void Window::WindowResizeCallback(GLFWwindow* window, int w, int h)
 void Window::FrameBufferSizeCallback(GLFWwindow* window, int w, int h)
 {
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    glViewport(0, 0, w, h);
+    //glViewport(0, 0, w, h);
 }
 
 void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)

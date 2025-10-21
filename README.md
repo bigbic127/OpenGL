@@ -19,3 +19,8 @@
 ## 🖼️ 샘플 렌더 결과
 
 ![alt text](screenshot/image.gif)
+
+
+
+
+![alt text](screenshot/image03.png)

@@ -36,13 +36,20 @@ int main()
         //source_shader
         std::string vertexShaderPath = "/shader/standard.vert";
         std::string fragShaderPath = "/shader/standard.frag";
+        std::string gridVertexShaderPath = "/shader/grid.vert";
+        std::string gridFragShaderPath = "/shader/grid.frag";
+
         std::string diffuseTexturePath = "/assets/container2.png";
         std::string specularTexturePath = "/assets/container2_specular.png";
         std::string moonTexturePath = "/assets/mercury.jpg";
         std::string cocacolaTexturePath = "/assets/cocacola.jpg";
+        //create shader
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexShaderPath, fragShaderPath);
+        std::shared_ptr<Shader> gridShader = std::make_shared<Shader>(gridVertexShaderPath, gridFragShaderPath);
         //standard material
         std::shared_ptr<Material> standardMaterial = std::make_shared<Material>(shader);
+        std::shared_ptr<Material> griddMaterial = std::make_shared<Material>(gridShader);
+
         //cube material
         std::shared_ptr<Material> boxMaterial = std::make_shared<Material>(shader);
         std::shared_ptr<Texture> boxDiffTexture = std::make_shared<Texture>(GetFullPath(diffuseTexturePath));
@@ -73,7 +80,7 @@ int main()
         cameraActor->name = "Camera";
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* cameraComponent = cameraActor->GetComponent<CameraComponent>();
-        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(0.0f, 2.0f, 10.0f));
+        cameraActor->GetComponent<CameraComponent>()->SetPosition(glm::vec3(5.0f, 5.0f, 15.0f));
         //cameraActor->GetComponent<CameraComponent>()->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
         //light
@@ -95,7 +102,7 @@ int main()
         actor->name = "CubeMesh01";
         actor->AddComponent<MeshComponent>(cubeMesh);
         actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
-        actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+        actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
         //actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f, -25.0f, 0.0f));
         //mesh02
         auto actor2 = world->CreateActor();
@@ -115,9 +122,9 @@ int main()
         auto actor4 = world->CreateActor();
         actor4->name = "PlaneMesh01";
         actor4->AddComponent<MeshComponent>(planeMesh);
-        actor4->GetComponent<MeshComponent>()->SetMaterial(standardMaterial);  
+        actor4->GetComponent<MeshComponent>()->SetMaterial(griddMaterial);  
         actor4->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f,-1.0f,0.0f)); 
-
+        actor4->GetComponent<MeshComponent>()->SetScale(glm::vec3(100.0f)); 
         //World Setting
         world->SetCurrentCamera(cameraComponent);
         world->AddLight(lightComponent);
@@ -156,15 +163,14 @@ int main()
             window.PollEvent();
             cameraActor->GetComponent<CameraComponent>()->SetAspect(renderer->GetAspect());
             input.Process(window.GetWindow(), deltaTime);
-
             //UpdataLoop
             world->Update();
+            editor.Update();
             //RenderLoop
-            renderer->Clear();
             renderer->Begin();
+            renderer->Clear();
             renderer->Render(world);
             renderer->End();
-            editor.Update();
             window.SwapBuffer();
         }
     }

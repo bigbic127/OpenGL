@@ -24,12 +24,12 @@ void OpenGLRenderer::Init()
 void OpenGLRenderer::Clear()
 {
     glClearColor(0.5,0.5,0.5,1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OpenGLRenderer::Begin()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OpenGLRenderer::Render(std::weak_ptr<World> world)
@@ -54,7 +54,6 @@ void OpenGLRenderer::CreateBuffer(int w, int h)
     height = h;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    //window->GetSize(width, height);
     //Color
     glGenTextures(1, &cbo);
     glBindTexture(GL_TEXTURE_2D, cbo);
@@ -70,15 +69,14 @@ void OpenGLRenderer::CreateBuffer(int w, int h)
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::ErrorMessage("Framebuffer not complete.");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 bool OpenGLRenderer::ResizeBuffer(int w, int h)
 {
     if(w <=0 || h <=0) return false;
     if(w == width && h == height) return true;
-
     glDeleteFramebuffers(1, &fbo);
     glDeleteTextures(1, &cbo);
     glDeleteRenderbuffers(1, &rbo);

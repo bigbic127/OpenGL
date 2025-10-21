@@ -31,5 +31,4 @@ class Editor
         IRenderer* renderer;
         Input* input;
         GLuint openFolderID;
-
 };

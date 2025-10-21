@@ -108,15 +108,49 @@ void Editor::CreateLayout()
         ImGui::SameLine();
         if(ImGui::BeginMenu("추가"))
         {
-            if(ImGui::MenuItem("박스"))
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+            ImGui::Text("Standard Mesh");
+            ImGui::PopStyleColor();
+            ImGui::Separator();
+            if(ImGui::MenuItem("Cube Mesh"))
             {
 
             }
-            if(ImGui::MenuItem("구"))
+            if(ImGui::MenuItem("Sphere Mesh"))
             {
 
             }
-            if(ImGui::MenuItem("원통"))
+            if(ImGui::MenuItem("Cylinder Mesh"))
+            {
+
+            }
+            if(ImGui::MenuItem("Cone Mesh"))
+            {
+
+            }
+            if(ImGui::MenuItem("Plan Mesh"))
+            {
+
+            }
+            ImGui::Separator();
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
+            ImGui::Text("Light");
+            ImGui::PopStyleColor();
+            ImGui::Separator();
+            if(ImGui::MenuItem("Directional"))
+            {
+
+            }
+            if(ImGui::MenuItem("Spot"))
+            {
+
+            }
+            if(ImGui::MenuItem("Point"))
+            {
+
+            }
+            ImGui::Separator();
+            if(ImGui::MenuItem("Camera"))
             {
 
             }
@@ -208,6 +242,11 @@ void Editor::CreateLayout()
         ImGui::End();
     }
     ImGui::PopStyleVar();
+    //Create Detail
+    if(ImGui::Begin("디테일"))
+    {
+        ImGui::End();
+    }
 }
 
 void Editor::CreateStyle()

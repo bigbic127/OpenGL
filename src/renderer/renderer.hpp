@@ -17,8 +17,6 @@ class IRenderer
         virtual unsigned int GetFrameBuffer()const = 0;
         virtual bool ResizeBuffer(int w, int h) = 0;
         virtual float GetAspect() const = 0;
-
-
 };
 
 class OpenGLRenderer:public IRenderer
