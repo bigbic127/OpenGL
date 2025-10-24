@@ -24,7 +24,8 @@ int main()
         editor.SetResourceManager(&resourceManager);
         editor.SetRenderer(renderer.get());
         editor.Init();
-
+        editor.SetWorld(world);
+        world->SetEditor(&editor);
 
         //resourceManager.LoadModel();
         //source_mesh
@@ -76,7 +77,7 @@ int main()
         lightMaterial->SetBaseColor(glm::vec3(1.0f));
         lightMaterial->SetAmbientColor(glm::vec3( 1.0f));
         //camera
-        auto cameraActor = world->CreateActor();
+        auto cameraActor = world->CreateActor("CameraActor");
         cameraActor->name = "Camera";
         cameraActor->AddComponent<CameraComponent>();
         CameraComponent* cameraComponent = cameraActor->GetComponent<CameraComponent>();
@@ -84,7 +85,7 @@ int main()
         //cameraActor->GetComponent<CameraComponent>()->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
         //light
-        auto lightActor = world->CreateActor();
+        auto lightActor = world->CreateActor("LightActor");
         lightActor->name = "Light";
         glm::vec3 pos = {0.0f, 3.0f, 1.0f};
         glm::vec3 rot = {0.0f, 0.0f, 45.0f};
@@ -98,14 +99,14 @@ int main()
         lightActor->GetComponent<LightComponent>()->SetRotation(rot);
         LightComponent* lightComponent = lightActor->GetComponent<LightComponent>();
         //mesh
-        auto actor = world->CreateActor();
+        auto actor = world->CreateActor("Cube");
         actor->name = "CubeMesh01";
         actor->AddComponent<MeshComponent>(cubeMesh);
         actor->GetComponent<MeshComponent>()->SetMaterial(boxMaterial);
         actor->GetComponent<MeshComponent>()->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
         //actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f, -25.0f, 0.0f));
         //mesh02
-        auto actor2 = world->CreateActor();
+        auto actor2 = world->CreateActor("Cylinder");
         actor2->name = "CylinderMesh01";
         actor2->AddComponent<MeshComponent>(cylinderMesh);
         actor2->GetComponent<MeshComponent>()->SetMaterial(cocacolaMaterial);  
@@ -113,13 +114,13 @@ int main()
         actor2->GetComponent<MeshComponent>()->SetScale(glm::vec3(0.1f, 0.5f, 0.1f));
         //actor->GetComponent<MeshComponent>()->SetRotation(glm::vec3(0.0f, 45.0f, 0.0f));
         //mesh03
-        auto actor3 = world->CreateActor();
+        auto actor3 = world->CreateActor("Sphere");
         actor3->name = "SphereMesh01";
         actor3->AddComponent<MeshComponent>(sphereMesh);
         actor3->GetComponent<MeshComponent>()->SetMaterial(moonMaterial);  
         actor3->GetComponent<MeshComponent>()->SetPosition(glm::vec3(-3.0f,0.0f,-1.5f)); 
         //mesh04
-        auto actor4 = world->CreateActor();
+        auto actor4 = world->CreateActor("Plane");
         actor4->name = "PlaneMesh01";
         actor4->AddComponent<MeshComponent>(planeMesh);
         actor4->GetComponent<MeshComponent>()->SetMaterial(griddMaterial);  
@@ -129,14 +130,13 @@ int main()
         world->SetCurrentCamera(cameraComponent);
         world->AddLight(lightComponent);
 
-        lightComponent->SetIntensity(2.5f);
+        lightComponent->SetIntensity(1.5f);
         lightComponent->SetColor(glm::vec3(1.0f,1.0f,1.0f));
 
         //Initialization
         input.SetCameraComponent(world->GetCurrentCamera());
         window.SetInput(&input);
         renderer->Init();
-
         //MainLoop
         while(!window.ShouldClose())
         {
@@ -154,11 +154,6 @@ int main()
             actor3->GetComponent<MeshComponent>()->SetRotation(rot);
             */
             float deltaTime = world->GetDeltaTime();
-
-            glm::vec3 rot = actor->GetComponent<MeshComponent>()->GetRotation();
-            rot = actor3->GetComponent<MeshComponent>()->GetRotation();
-            rot.y += 50.0f * deltaTime;
-            actor3->GetComponent<MeshComponent>()->SetRotation(rot);
 
             window.PollEvent();
             cameraActor->GetComponent<CameraComponent>()->SetAspect(renderer->GetAspect());

@@ -1,12 +1,20 @@
 #include "world.hpp"
 #include "GLFW/glfw3.h"
 #include "core/logger.hpp"
+#include "core/editor.hpp"
 
-Actor* World::CreateActor()
+Actor* World::CreateActor(std::string name)
 {
-    auto actor = std::make_unique<Actor>();
+
+    auto actor = std::make_unique<Actor>(id);
+    actor->name = name;
     Actor* ptr = actor.get();
     actors.push_back(std::move(actor));
+    id += 1;
+    if(editor != nullptr)
+    {
+        editor->CreateNode(ptr);
+    }
     return ptr;
 }
 

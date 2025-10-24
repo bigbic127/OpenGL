@@ -10,11 +10,22 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+enum ShapeType
+{
+    CUBE = 0,
+    SPHERE,
+    CONE,
+    CYLINDER,
+    PLAN
+};
+
+
 class ResourceManager
 {
     public:
         ResourceManager(std::shared_ptr<World> world);
         void LoadModel();
+        void CreateStandardShpae(ShapeType type);
 
     private:
         void processShader();
@@ -22,8 +33,10 @@ class ResourceManager
         void ProcessTexture(const aiScene* scene);
         void ProcessMesh(const aiScene* scene);
         void ProcessNode(aiNode* node, const aiScene* scene);
-
+        void CreateShape();
         std::weak_ptr<World> world;
+        std::vector<std::shared_ptr<IMesh>> standardShape;
+        std::vector<std::shared_ptr<Material>> standardMaterials;
         std::vector<std::shared_ptr<IMesh>> meshes;
         std::vector<std::shared_ptr<Shader>> shaders;
         std::vector<std::shared_ptr<Material>> materials;

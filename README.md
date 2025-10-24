@@ -10,7 +10,6 @@
 - **메시(Mesh), 카메라(Camera), 조명(Light)** Component 설계 및 구현
 - **셰이더(Shader),매터리얼(Material)** 설계 및 구현
 
-
 ## 참고 사이트
 - **https://learnopengl.com/**
 - **https://media.korea.ac.kr/books/**
@@ -22,5 +21,8 @@
 
 
 
+![alt text](screenshot/image.png)
 
-![alt text](screenshot/image03.png)
+
+
+![alt text](screenshot/image01.png)

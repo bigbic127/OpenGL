@@ -4,6 +4,7 @@
 #include "resource/resource.hpp"
 
 class CameraComponent;
+class Wrold;
 
 class Input
 {
@@ -17,8 +18,10 @@ class Input
     private:
         CameraComponent* camera;
         ResourceManager* resourceManager;
+        World* world;
         bool bMouseLeftClicked = false, bMouseRightClicked, bMouseMiddleClicked;
         bool bFirstClicked = false;
         float lastX, lastY;
+        float yaw, pitch;
         
 };

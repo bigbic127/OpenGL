@@ -3,10 +3,13 @@
 #include "core/logger.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
+#include <sstream>
+#include <iomanip>
 
 ResourceManager::ResourceManager(std::shared_ptr<World> world):world(world)
 {
     processShader();
+    CreateShape();
 }
 
 void ResourceManager::LoadModel()
@@ -220,7 +223,7 @@ void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
             transform.rotation = glm::degrees(glm::eulerAngles(glm::normalize(quat)));
             transform.scale = glm::vec3(scale.x, scale.y, scale.z);
 
-            auto actor = ptr->CreateActor();
+            auto actor = ptr->CreateActor(mesh->mName.C_Str());
             actor->name = mesh->mName.C_Str();
             actor->AddComponent<MeshComponent>(meshes[index]);
             actor->GetComponent<MeshComponent>()->SetTransform(transform);
@@ -232,4 +235,82 @@ void ResourceManager::ProcessNode(aiNode* node, const aiScene* scene)
     {
         ProcessNode(node->mChildren[i], scene);
     }
+}
+
+void ResourceManager::CreateShape()
+{
+    std::shared_ptr<IMesh> cubeMesh =std::make_shared<CubeMesh>();
+    std::shared_ptr<IMesh> sphereMesh = std::make_shared<ShpereMesh>(32,32,1.0f);
+    std::shared_ptr<IMesh> coneMesh = std::make_shared<ConeMesh>(3,3.0f,1.0f);
+    std::shared_ptr<IMesh> cylinderMesh = std::make_shared<CylinderMesh>(32, 2.0f, 2.0f);
+    std::shared_ptr<IMesh> planeMesh = std::make_shared<PlaneMesh>(10.0f);
+    standardShape.push_back(cubeMesh);
+    standardShape.push_back(sphereMesh);
+    standardShape.push_back(coneMesh);
+    standardShape.push_back(cylinderMesh);
+    standardShape.push_back(planeMesh);
+
+    std::shared_ptr<Material> standardMaterial = std::make_shared<Material>(shaders[0]);
+    standardMaterial->SetBaseColor(glm::vec3(0.5f));
+    standardMaterial->SetAmbientColor(glm::vec3(0.1f));
+    standardMaterials.push_back(standardMaterial);
+}
+
+void ResourceManager::CreateStandardShpae(ShapeType type)
+{
+    if(auto ptr = world.lock())
+    {
+        switch (type)
+        {
+        case ShapeType::CUBE:
+            {
+                int num = 0;
+                for(auto& a:ptr->GetActors())
+                {
+                    if(a->name.compare(0,4,"Cube") == 0)
+                    {
+                        num +=1;
+                    }
+                }
+                std::string name = "Cube";
+                std::ostringstream oss;
+                if(num >0)
+                {
+                    oss<<name<<std::setw(3)<<std::setfill('0')<<num;
+                    name = oss.str();
+                }
+                auto actor = ptr->CreateActor(name);
+                actor->name = name;
+                actor->AddComponent<MeshComponent>(standardShape[0]);
+                actor->GetComponent<MeshComponent>()->SetMaterial(standardMaterials[0]);
+            }
+            break;
+        case ShapeType::SPHERE:
+            {
+                int num = 0;
+                for(auto& a:ptr->GetActors())
+                {
+                    if(a->name.compare(0,6,"Sphere") == 0)
+                    {
+                        num +=1;
+                    }
+                }
+                std::string name = "Sphere";
+                std::ostringstream oss;
+                if(num >0)
+                {
+                    oss<<name<<std::setw(3)<<std::setfill('0')<<num;
+                    name = oss.str();
+                }
+                auto actor = ptr->CreateActor(name);
+                actor->name = name;
+                actor->AddComponent<MeshComponent>(standardShape[1]);
+                actor->GetComponent<MeshComponent>()->SetMaterial(standardMaterials[0]);
+            }
+            break;
+        default:
+            break;
+        }        
+    }
+
 }

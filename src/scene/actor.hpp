@@ -8,6 +8,8 @@ class Actor
 {
     public:
         Actor(const std::string& n = "Actor"):name(n){}
+        Actor(int i = -1):id(i){}
+
         std::string name;
         template<typename T, typename... Args>
             T* AddComponent(Args&&... args)
@@ -53,6 +55,8 @@ class Actor
             }
         void Update(float deltaTime);
         void Render(CameraComponent* currentCamera, std::vector<LightComponent*> lights);
+        void SetID(unsigned int i){id = i;}
     private:
         std::vector<std::unique_ptr<IComponent>> components;
+        unsigned int id = -1;
 };

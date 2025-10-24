@@ -17,7 +17,7 @@ void Input::Process(GLFWwindow* window, float deltaTime)
     {
         resourceManager->LoadModel();
     }
-    float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+    float cameraSpeed = static_cast<float>(5.0f * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         position += cameraSpeed * front;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -38,15 +38,18 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 {
     if(glfwGetMouseButton(window, button) == GLFW_PRESS)
     {
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
             if(action == GLFW_PRESS)
+            {
                 bMouseLeftClicked = true;
+            }
+                
         }
     }
     else
     {
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
             if(action == GLFW_RELEASE)
             {
@@ -61,8 +64,6 @@ void Input::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     if(bMouseLeftClicked)
     {
-        float yaw = camera->GetRotation().y;
-        float pitch = camera->GetRotation().x;
         float x = static_cast<float>(xpos);
         float y = static_cast<float>(ypos);
         if (!bFirstClicked)
@@ -89,7 +90,7 @@ void Input::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         front.y = sin(glm::radians(pitch));
         front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         front = glm::normalize(front);
-        //camera->SetFront(front);
+        camera->SetFront(front);
     }
 }
 

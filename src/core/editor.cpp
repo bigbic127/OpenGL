@@ -70,6 +70,25 @@ void Editor::Update()
     ImGui::NewFrame();
     CreateLayout();
     //ImGui::ShowDemoWindow();
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        if(ImGui::IsKeyPressed(ImGuiKey_Delete))
+        {
+            
+            if(selectedNode != nullptr)
+            {
+                if(auto ptr = world.lock())
+                {
+                    std::cerr<<selectedNode->actor->name<<std::endl;
+
+                    ptr->DeleteActor(selectedNode->actor);
+                }
+                nodes.erase(nodes.begin() + selectedNode->id);
+                selectedNode = nullptr;
+
+            }
+        }
+    }
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -114,23 +133,23 @@ void Editor::CreateLayout()
             ImGui::Separator();
             if(ImGui::MenuItem("Cube Mesh"))
             {
-
+                resourceManager->CreateStandardShpae(ShapeType::CUBE);
             }
             if(ImGui::MenuItem("Sphere Mesh"))
             {
-
+                resourceManager->CreateStandardShpae(ShapeType::SPHERE);
             }
             if(ImGui::MenuItem("Cylinder Mesh"))
             {
-
+                //
             }
             if(ImGui::MenuItem("Cone Mesh"))
             {
-
+                //
             }
             if(ImGui::MenuItem("Plan Mesh"))
             {
-
+                //
             }
             ImGui::Separator();
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 0.5f));
@@ -139,20 +158,20 @@ void Editor::CreateLayout()
             ImGui::Separator();
             if(ImGui::MenuItem("Directional"))
             {
-
+                //
             }
             if(ImGui::MenuItem("Spot"))
             {
-
+                //
             }
             if(ImGui::MenuItem("Point"))
             {
-
+                //
             }
             ImGui::Separator();
             if(ImGui::MenuItem("Camera"))
             {
-
+                //
             }
             ImGui::EndMenu();
         }
@@ -199,7 +218,8 @@ void Editor::CreateLayout()
     ImGui::SetNextWindowViewport(guiViewport->ID);
     flags = ImGuiWindowFlags_NoDecoration | 
             ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoSavedSettings | 
+            ImGuiWindowFlags_NoSavedSettings |
+            ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoBringToFrontOnFocus | //포커스 시 앞으로 나오지 않게
             ImGuiWindowFlags_NoNavFocus;             //네비게이션 포커스 받지 않게
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5.0f,0.0f));
@@ -211,22 +231,26 @@ void Editor::CreateLayout()
     //Create Hierarchy
     if(ImGui::Begin("아웃라이너"))
     {
-        if(ImGui::TreeNode("Scene"))
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                   ImGuiTreeNodeFlags_SpanAvailWidth |
+                                   ImGuiTreeNodeFlags_Leaf;
+                                   //ImGuiTreeNodeFlags_Selected;
+        if (ImGui::TreeNodeEx("Scene", flags))
         {
-            ImGui::Selectable("CameraActor");
-            ImGui::Selectable("DirectionalLight Actor");
-            if(ImGui::TreeNode("Mesh Actor"))
+            ImGui::Indent(10.0f);
+            int selectedIndex = -1;
+            for(size_t i=0;i<nodes.size(); i++)
             {
-                ImGui::Selectable("Mesh01");
-                ImGui::Selectable("Mesh02");
-                if (ImGui::TreeNode("Mesh03"))
+                bool selected = (selectedIndex == i);
+                if(ImGui::Selectable(nodes[i]->name.c_str(), selected))
                 {
-                    ImGui::Selectable("Mesh04");
-                    ImGui::Selectable("Mesh05");
-                    ImGui::TreePop();
+                    Logger::ErrorMessage(nodes[i]->name.c_str());
+                    selectedNode = nodes[i].get();
+                    selectedNode->actor->SetID(i);
+                    selectedNode->id = i;
+                    transform = selectedNode->actor->GetComponent<SceneComponent>()->GetTransform();
                 }
-                ImGui::TreePop();
-            }
+            }   
             ImGui::TreePop();
         }
         ImGui::End();
@@ -245,6 +269,35 @@ void Editor::CreateLayout()
     //Create Detail
     if(ImGui::Begin("디테일"))
     {
+        if (ImGui::BeginTabBar("MyTabBar"))
+        {
+            if (ImGui::BeginTabItem("Transform"))
+            {
+                std::string name = "";
+                if(selectedNode != nullptr)
+                    name = selectedNode->name;
+                ImGui::Text("Mesh Name: ");
+                ImGui::SameLine();
+                ImGui::Text(name.c_str());
+                ImGui::Separator();
+                if(ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    ImGui::DragFloat3("Position", &transform.position.x, 0.1f);
+                    ImGui::DragFloat3("Rotation", &transform.rotation.x, 0.1f);
+                    ImGui::DragFloat3("Scale", &transform.scale.x, 0.1f);
+                    if(selectedNode != nullptr)
+                    {
+                        selectedNode->actor->GetComponent<SceneComponent>()->SetTransform(transform);
+                        if(selectedNode->actor->GetComponent<LightComponent>() !=nullptr)
+                            selectedNode->actor->GetComponent<LightComponent>()->SetTransform(transform);
+                    }
+                }
+
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
+        
         ImGui::End();
     }
 }
@@ -255,4 +308,14 @@ void Editor::CreateStyle()
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 0.5f;
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+}
+
+Node* Editor::CreateNode(Actor* actor)
+{  
+    auto node = std::make_unique<Node>();
+    Node* ptr = node.get();
+    node->actor = actor;
+    node->name = actor->name;
+    nodes.push_back(std::move(node));
+    return ptr;
 }
