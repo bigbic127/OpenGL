@@ -6,28 +6,25 @@
 ## 주요 특징
 
 - **OpenGL 기반 렌더링 파이프라인 구현**  
-  정점 처리, 라스터화, 프래그먼트 연산 등 GPU 파이프라인 전 과정을 직접 구성
 
 - **Forward Rendering 구조**  
-  다중 광원 및 실시간 조명(Real-Time Lighting)을 지원하는 전방 렌더링 방식 적용
 
 - **컴포넌트 기반 엔진 아키텍처**  
   Renderer, Actor, Component 단위로 모듈화된 엔진 구조 설계
 
 - **핵심 컴포넌트 구현**
-  - **SceneComponent** : Transform(Position, Rotation, Scale) 정보를 관리  
-  - **MeshComponent**  : 정점·인덱스 버퍼 및 렌더링 데이터 관리  
-  - **CameraComponent** : View, Projection 행렬 계산 및 뷰 변환 처리  
-  - **LightComponent** : Driectional, Point, Spot 광원 관리
+  - **SceneComponent** : Transform(Position, Rotation, Scale)
+  - **MeshComponent**  : Generate Buffer Objects(VAO, VBO, EBO), Rendering 
+  - **CameraComponent** : View, Projection 
+  - **LightComponent** : Driectional Light, Point Light, Spot Light 
 
 - **Shader & Material 시스템**  
-  GLSL 셰이더 파이프라인 구축 및 머티리얼 파라미터 관리
+  GLSL 셰이더 파이프라인 구축 및 머티리얼 파라미터 설정
 
 - **Resource Manager**  
-  메시, 텍스처, 셰이더, 머티리얼 등 렌더링에 필요한 리소스 관리
+  메시, 텍스처, 셰이더, 머티리얼 등 렌더링에 필요한 리소스 생성 및 관리
 
 ## 사용 라이브러리
-
 - **GLFW** : OpenGL 컨텍스트 및 윈도우 관리, 입력 처리  
 - **Assimp** : 3D 모델 포맷(.obj, .fbx, .glb 등) 로딩 및 메시 데이터 파싱  
 - **stb_image** : 이미지(Texture) 파일 로딩  
